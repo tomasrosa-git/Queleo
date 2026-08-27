@@ -68,10 +68,10 @@ queleo/
 │   │   │   ├── perfilLector.ts
 │   │   │   └── recomendaciones.ts
 │   │   ├── middleware/      # requireAuth, rateLimiter, errorHandler
-│   │   ├── prisma/
-│   │   │   └── schema.prisma
 │   │   ├── lib/
 │   │   └── server.ts
+│   ├── prisma/
+│   │   └── schema.prisma
 │   ├── .env.example
 │   └── package.json
 ├── frontend/
@@ -139,7 +139,7 @@ queleo/
 ## Fases sugeridas (una rama/PR por fase)
 
 1. **Setup** — estructura del repo, Prisma schema base, conexión a
-   Supabase, `CLAUDE.md` y `STATE.md` iniciales.
+   Supabase, `STATE.md` inicial.
 2. **Auth + catálogo básico** — JWT/refresh, búsqueda de libros vía Google
    Books API, cacheo local de metadata.
 3. **Biblioteca personal** — estados de lectura, ratings, reseñas propias.
