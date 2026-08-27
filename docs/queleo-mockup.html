@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Queleo — dirección visual</title>
+<style>
+  :root {
+    --papel: #F5F4F0;
+    --tarjeta: #FBFAF7;
+    --tinta: #201E1B;
+    --guinda: #7A2E32;
+    --verde: #34473B;
+    --piedra: #86807A;
+    --linea: #D9D5CB;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--papel);
+    color: var(--tinta);
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  a { color: inherit; }
+  .wrap { max-width: 760px; margin: 0 auto; padding: 0 28px 64px; }
+
+  /* nav */
+  nav {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 28px 0 20px; border-bottom: 1px solid var(--linea);
+    margin-bottom: 48px;
+  }
+  .marca {
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-weight: 700; font-size: 20px; letter-spacing: -0.01em;
+  }
+  .nav-links { display: flex; gap: 28px; font-size: 13px; }
+  .nav-links span {
+    text-transform: uppercase; letter-spacing: 0.08em; color: var(--piedra);
+    cursor: default;
+  }
+  .nav-links span.activo { color: var(--tinta); }
+
+  /* ficha */
+  .ficha { display: flex; gap: 40px; margin-bottom: 44px; }
+  .cubierta {
+    flex: 0 0 168px; height: 252px; border-radius: 2px;
+    background: linear-gradient(155deg, #8C3438 0%, var(--guinda) 55%, #5E2226 100%);
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 1px 2px rgba(32,30,27,0.08), 0 8px 20px rgba(32,30,27,0.12);
+  }
+  .cubierta span {
+    font-size: 10px;
+    letter-spacing: 0.12em; color: rgba(245,244,240,0.55); text-transform: uppercase;
+  }
+  .info { flex: 1; min-width: 0; }
+  .eyebrow {
+    font-size: 11px;
+    letter-spacing: 0.1em; color: var(--piedra); text-transform: uppercase;
+    margin: 4px 0 10px;
+  }
+  h1 {
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-weight: 700; font-size: 32px; letter-spacing: -0.01em;
+    line-height: 1.15; margin: 0 0 8px;
+  }
+  .autor { font-size: 15px; color: var(--piedra); margin: 0 0 18px; }
+  .meta {
+    font-size: 11px; color: var(--piedra); font-variant-numeric: tabular-nums;
+    letter-spacing: 0.03em; padding-top: 14px; border-top: 1px solid var(--linea);
+    margin-bottom: 20px;
+  }
+  .puntajes { display: flex; gap: 32px; align-items: flex-end; margin-bottom: 22px; }
+  .puntaje-label {
+    font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase;
+    color: var(--piedra); margin-bottom: 4px;
+  }
+  .puntaje-valor {
+    font-weight: 700; font-variant-numeric: tabular-nums;
+  }
+  .puntaje-valor.grande { font-size: 30px; color: var(--guinda); }
+  .puntaje-valor.chico { font-size: 18px; color: var(--tinta); }
+  .puntaje-valor .sobre { font-size: 14px; color: var(--piedra); font-weight: 400; }
+
+  button {
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; font-size: 13px; font-weight: 500;
+    letter-spacing: 0.02em; background: var(--guinda); color: var(--papel);
+    border: none; border-radius: 2px; padding: 12px 20px; cursor: pointer;
+  }
+  button:hover { background: #6A2529; }
+  button:focus-visible { outline: 2px solid var(--tinta); outline-offset: 2px; }
+
+  /* colofón */
+  .colofon {
+    border-top: 1px solid var(--linea); border-bottom: 1px solid var(--linea);
+    padding: 22px 0; margin-bottom: 48px;
+  }
+  .colofon-titulo {
+    font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em;
+    color: var(--piedra); margin: 0 0 10px;
+  }
+  .colofon p {
+    font-size: 15px; line-height: 1.6; margin: 0 0 10px; max-width: 58ch;
+  }
+  .colofon-fuente {
+    font-size: 11px; color: var(--piedra); font-variant-numeric: tabular-nums;
+  }
+
+  /* estante */
+  .estante-titulo {
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-weight: 500; font-size: 13px; text-transform: uppercase;
+    letter-spacing: 0.06em; color: var(--piedra); margin: 0 0 16px;
+  }
+  .estante { display: flex; gap: 8px; }
+  .lomo {
+    flex: 1; height: 148px; border-radius: 2px; position: relative;
+    display: flex; align-items: flex-end; padding: 12px 0;
+    justify-content: center; cursor: pointer;
+    transition: transform 0.15s ease;
+  }
+  .lomo:hover { transform: translateY(-6px); }
+  .lomo span {
+    writing-mode: vertical-rl; transform: rotate(180deg);
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; font-size: 11px; font-weight: 500;
+    letter-spacing: 0.02em;
+  }
+  .lomo.c1 { background: var(--guinda); color: #F2DEDD; }
+  .lomo.c2 { background: var(--verde); color: #DCE6DE; }
+  .lomo.c3 { background: var(--tinta); color: #D9D5CB; }
+  .lomo.c4 { background: #A8874A; color: #2C2213; }
+  .lomo.c5 { background: var(--piedra); color: #2C2A26; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .lomo { transition: none; }
+    .lomo:hover { transform: none; }
+  }
+  @media (max-width: 560px) {
+    .ficha { flex-direction: column; }
+    .cubierta { width: 140px; height: 210px; }
+    h1 { font-size: 27px; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <nav>
+    <div class="marca">Queleo</div>
+    <div class="nav-links">
+      <span>Biblioteca</span>
+      <span class="activo">Descubrir</span>
+      <span>Perfil</span>
+    </div>
+  </nav>
+
+  <div class="ficha">
+    <div class="cubierta"><span>cubierta</span></div>
+    <div class="info">
+      <p class="eyebrow">Novela · Ficción literaria</p>
+      <h1>Un día de otoño extraviado</h1>
+      <p class="autor">Marina Coll</p>
+      <p class="meta">312 páginas — 2019 — ISBN 9788433999120</p>
+      <div class="puntajes">
+        <div>
+          <div class="puntaje-label">Tu predicción</div>
+          <div class="puntaje-valor grande">8.7<span class="sobre">/10</span></div>
+        </div>
+        <div>
+          <div class="puntaje-label">Promedio público</div>
+          <div class="puntaje-valor chico">4.1<span class="sobre">/5</span></div>
+        </div>
+      </div>
+      <button type="button">Agregar a mi biblioteca</button>
+    </div>
+  </div>
+
+  <div class="colofon">
+    <p class="colofon-titulo">Por qué te lo recomendamos</p>
+    <p>Tu perfil muestra preferencia marcada por ficción literaria de ritmo lento y estructura fragmentada — dos libros con esa forma narrativa los calificaste con 9/10 este año. El desenlace ambiguo puede no cerrarte del todo: es el punto más bajo frente a tu patrón habitual.</p>
+    <p class="colofon-fuente">Calculado a partir de 14 libros en tu biblioteca</p>
+  </div>
+
+  <p class="estante-titulo">De tu estante</p>
+  <div class="estante">
+    <div class="lomo c1"><span>Los detectives salvajes</span></div>
+    <div class="lomo c2"><span>Klara y el sol</span></div>
+    <div class="lomo c3"><span>La invención de Morel</span></div>
+    <div class="lomo c4"><span>Trust</span></div>
+    <div class="lomo c5"><span>Las cosas que perdimos en el fuego</span></div>
+  </div>
+
+</div>
+</body>
+</html>
