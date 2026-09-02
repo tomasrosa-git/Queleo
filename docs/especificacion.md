@@ -125,12 +125,18 @@ queleo/
 - **Fuente de catálogo:** Google Books API como fuente primaria de metadata
   y tapas; se cachea localmente lo mínimo necesario (id, título, autor,
   isbn) para no depender de la disponibilidad de la API en cada request.
+  Requiere API key propia: sin ella los requests caen en una cuota anónima
+  compartida que devuelve `429` casi siempre.
 
 ## Infraestructura
 
 - **Base de datos:** Supabase (Postgres gestionado) — mismo proveedor que
   Raccord, sin el riesgo de egress porque no hay tráfico de imágenes.
-- **Backend y frontend:** Render (Web Services)
+- **Frontend:** Vercel (plan Hobby) — nativo para Next.js y sin el tope de
+  horas de Render.
+- **Backend:** Render (Web Service). El free tier de Render da 750 horas
+  mensuales compartidas por cuenta entre todos los servicios activos, así que
+  conviene que sea el único servicio ahí.
 - **IA:** Gemini API (Google AI Studio), modelos Flash — free tier, sin
   costo, con límite diario de requests
 - **Dominio:** a definir

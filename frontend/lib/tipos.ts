@@ -33,3 +33,26 @@ export function fichaTecnica(libro: Libro) {
     .filter(Boolean)
     .join(" — ");
 }
+
+export type RolMensaje = "USUARIO" | "ASISTENTE";
+
+export type MensajeOnboarding = {
+  id: string;
+  rol: RolMensaje;
+  contenido: string;
+};
+
+export type PerfilLector = {
+  resumen: string;
+  generos: string[];
+  autores: string[];
+  patrones: string[];
+  actualizadoEn: string;
+};
+
+export type EstadoPerfil = {
+  perfil: PerfilLector | null;
+  mensajes: MensajeOnboarding[];
+  saludo: string;
+  consumo: { llamados: number; techo: number };
+};

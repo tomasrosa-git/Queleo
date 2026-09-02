@@ -7,6 +7,7 @@ import { authRouter } from "./routes/auth.js";
 import { bibliotecaRouter } from "./routes/biblioteca.js";
 import { healthRouter } from "./routes/health.js";
 import { librosRouter } from "./routes/libros.js";
+import { perfilRouter } from "./routes/perfil.js";
 
 const app = express();
 
@@ -23,6 +24,7 @@ app.use(healthRouter);
 app.use(authRouter);
 app.use(librosRouter);
 app.use(bibliotecaRouter);
+app.use(perfilRouter);
 
 app.use(errorHandler);
 

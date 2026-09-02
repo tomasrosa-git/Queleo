@@ -4,10 +4,18 @@ import { prisma } from "../lib/prisma.js";
 import { REFRESH_DAYS } from "../lib/tokens.js";
 import { parsear } from "../lib/validacion.js";
 import { AppError } from "../middleware/errorHandler.js";
+import { rateLimiter } from "../middleware/rateLimiter.js";
 import { requireAuth } from "../middleware/requireAuth.js";
 import * as auth from "../servicios/auth.js";
 
 export const authRouter = Router();
+
+const limitePorIp = rateLimiter({
+  ventanaMs: 15 * 60 * 1000,
+  maximo: 10,
+  mensaje: "Demasiados intentos. Probá de nuevo en unos minutos.",
+  clave: (req) => req.ip ?? "anonimo",
+});
 
 const COOKIE = "refresh";
 const enProduccion = process.env.NODE_ENV === "production";
@@ -33,7 +41,7 @@ const loginSchema = z.object({
   password: z.string().min(1, "Falta la contraseña"),
 });
 
-authRouter.post("/auth/register", async (req, res) => {
+authRouter.post("/auth/register", limitePorIp, async (req, res) => {
   const { email, password, name } = parsear(registerSchema, req.body);
   const { user, accessToken, refreshToken } = await auth.register(
     email,
@@ -45,7 +53,7 @@ authRouter.post("/auth/register", async (req, res) => {
   res.status(201).json({ user, accessToken });
 });
 
-authRouter.post("/auth/login", async (req, res) => {
+authRouter.post("/auth/login", limitePorIp, async (req, res) => {
   const { email, password } = parsear(loginSchema, req.body);
   const { user, accessToken, refreshToken } = await auth.login(email, password);
 

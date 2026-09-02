@@ -9,6 +9,7 @@
     "start": "node dist/server.js",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
+    "probar:gemini": "tsx scripts/probar-gemini.mts",
     "prisma": "prisma"
   },
   "dependencies": {

@@ -7,7 +7,7 @@ import { useSesion } from "./SesionProvider";
 const secciones = [
   { label: "Biblioteca", href: "/biblioteca" },
   { label: "Descubrir", href: "/buscar" },
-  { label: "Perfil", href: null },
+  { label: "Perfil", href: "/perfil" },
 ];
 
 export function Nav() {
