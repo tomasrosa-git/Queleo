@@ -1,10 +1,19 @@
 # Queleo
 
 Plataforma web sobre libros con un perfil lector construido junto a una IA como
-eje central: en vez de un promedio público de ratings, recomendaciones y
-análisis razonados a partir de quién sos como lector.
+eje central. En vez del promedio público de ratings, Queleo arma un perfil a
+partir de lo que leíste y cómo lo calificaste, y sobre eso da recomendaciones,
+predicciones de puntaje y análisis con el razonamiento explícito de por qué te
+tocan a vos.
 
-La especificación completa está en [`docs/especificacion.md`](docs/especificacion.md).
+- **Perfil lector conversacional** — el onboarding es una charla con la IA, no
+  un formulario de tildes.
+- **Recomendaciones explicadas** — cada sugerencia viene con el porqué, en un
+  bloque con el mismo rol que la nota de edición al final de un libro.
+- **Análisis de libro puntual** — sinopsis, predicción de tu rating y el
+  razonamiento detrás, contrastado contra el promedio público.
+- **Book pairing por texto libre** — "vi Severance y quiero algo con esa vibra".
+- **Biblioteca personal** — estados de lectura, ratings y reseñas propias.
 
 ## Stack
 
@@ -15,65 +24,7 @@ La especificación completa está en [`docs/especificacion.md`](docs/especificac
 | Base de datos | PostgreSQL (Supabase) |
 | IA | Gemini API (Google AI Studio), modelos Flash |
 | Catálogo | Google Books API |
-| Deploy | Render |
+| Deploy | Vercel (frontend) y Render (backend) |
 
 `frontend/` y `backend/` son dos servicios independientes, cada uno con su
-propio `package.json` y su `package-lock.json`.
-
-## Levantar el proyecto
-
-Requiere Node 24 y una base PostgreSQL (en desarrollo, un proyecto de Supabase).
-
-### Backend
-
-```bash
-cd backend
-npm install
-cp .env.example .env   # completar DATABASE_URL, DIRECT_URL y GOOGLE_BOOKS_API_KEY
-npx prisma migrate dev
-npm run dev            # http://localhost:4000
-npm test               # tests del parseo de Google Books
-```
-
-`DATABASE_URL` es la connection string del pooler de Supabase, que usa la
-aplicación en runtime. `DIRECT_URL` es la conexión directa y la usan las
-migraciones, que no pueden ir por el pooler.
-
-`GOOGLE_BOOKS_API_KEY` sale de Google Cloud Console con la Books API
-habilitada. Sin ella los requests van contra una cuota anónima compartida
-entre todos los proyectos sin autenticar, que suele estar agotada.
-
-### Frontend
-
-```bash
-cd frontend
-npm install
-cp .env.example .env.local
-npm run dev            # http://localhost:3000
-```
-
-## Estructura
-
-```
-queleo/
-├── backend/
-│   ├── prisma/schema.prisma
-│   └── src/
-│       ├── routes/       # capa HTTP, un archivo por recurso
-│       ├── servicios/    # lógica de negocio y llamadas externas
-│       ├── middleware/   # requireAuth, rateLimiter, errorHandler
-│       ├── lib/
-│       └── server.ts
-├── frontend/
-│   ├── app/
-│   ├── components/
-│   └── lib/
-└── docs/
-```
-
-## Convención de nombres
-
-El vocabulario de dominio va en español (`libro`, `biblioteca`, `perfilLector`,
-`resena`) y las piezas genéricas de infraestructura en inglés (`errorHandler`,
-`requireAuth`, `AppError`). La autenticación cuenta como infraestructura: los
-modelos `User` y `RefreshToken` están íntegramente en inglés.
+propio `package.json`.
