@@ -56,3 +56,10 @@ export type EstadoPerfil = {
   saludo: string;
   consumo: { llamados: number; techo: number };
 };
+
+export type Recomendacion = {
+  id: string;
+  razonamiento: string;
+  reparo: string | null;
+  libro: Libro;
+};
