@@ -1,0 +1,4 @@
+# unrs-resolver (lo usa el resolver de ESLint) compila un binario nativo en su
+# postinstall; pnpm lo bloquea por defecto.
+allowBuilds:
+  unrs-resolver: true
