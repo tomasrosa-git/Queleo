@@ -1,0 +1,6 @@
+# Prisma baja sus engines y tsx compila esbuild en un postinstall: pnpm los
+# bloquea por defecto y sin esto el cliente de Prisma no se genera.
+allowBuilds:
+  '@prisma/engines': true
+  esbuild: true
+  prisma: true

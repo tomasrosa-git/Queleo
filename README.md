@@ -25,6 +25,7 @@ tocan a vos.
 | IA | Gemini API (Google AI Studio), modelos Flash |
 | Catálogo | Google Books API |
 | Deploy | Vercel (frontend) y Render (backend) |
+| Gestor de paquetes | pnpm |
 
 `frontend/` y `backend/` son dos servicios independientes, cada uno con su
-propio `package.json`.
+propio `package.json` y su `pnpm-lock.yaml`.
