@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Nav } from "@/components/Nav";
+import { SesionProvider } from "@/components/SesionProvider";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -12,10 +13,12 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="es" className="h-full">
       <body className="min-h-full">
-        <div className="mx-auto max-w-[760px] px-7 pb-16">
-          <Nav />
-          {children}
-        </div>
+        <SesionProvider>
+          <div className="mx-auto max-w-[760px] px-7 pb-16">
+            <Nav />
+            {children}
+          </div>
+        </SesionProvider>
       </body>
     </html>
   );
