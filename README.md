@@ -29,14 +29,19 @@ Requiere Node 24 y una base PostgreSQL (en desarrollo, un proyecto de Supabase).
 ```bash
 cd backend
 npm install
-cp .env.example .env   # completar DATABASE_URL y DIRECT_URL
+cp .env.example .env   # completar DATABASE_URL, DIRECT_URL y GOOGLE_BOOKS_API_KEY
 npx prisma migrate dev
 npm run dev            # http://localhost:4000
+npm test               # tests del parseo de Google Books
 ```
 
 `DATABASE_URL` es la connection string del pooler de Supabase, que usa la
 aplicación en runtime. `DIRECT_URL` es la conexión directa y la usan las
 migraciones, que no pueden ir por el pooler.
+
+`GOOGLE_BOOKS_API_KEY` sale de Google Cloud Console con la Books API
+habilitada. Sin ella los requests van contra una cuota anónima compartida
+entre todos los proyectos sin autenticar, que suele estar agotada.
 
 ### Frontend
 
