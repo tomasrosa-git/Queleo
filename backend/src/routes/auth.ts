@@ -2,6 +2,7 @@ import { Router } from "express";
 import { z } from "zod";
 import { prisma } from "../lib/prisma.js";
 import { REFRESH_DAYS } from "../lib/tokens.js";
+import { parsear } from "../lib/validacion.js";
 import { AppError } from "../middleware/errorHandler.js";
 import { requireAuth } from "../middleware/requireAuth.js";
 import * as auth from "../servicios/auth.js";
@@ -31,14 +32,6 @@ const loginSchema = z.object({
   email: z.email("Email inválido"),
   password: z.string().min(1, "Falta la contraseña"),
 });
-
-function parsear<T>(schema: z.ZodType<T>, body: unknown): T {
-  const resultado = schema.safeParse(body);
-  if (!resultado.success) {
-    throw new AppError(400, resultado.error.issues[0].message);
-  }
-  return resultado.data;
-}
 
 authRouter.post("/auth/register", async (req, res) => {
   const { email, password, name } = parsear(registerSchema, req.body);

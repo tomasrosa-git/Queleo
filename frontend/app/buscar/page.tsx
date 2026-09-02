@@ -1,18 +1,11 @@
 "use client";
 
+import Link from "next/link";
 import { useState } from "react";
+import { Portada } from "@/components/Portada";
 import { useRequiereSesion } from "@/components/SesionProvider";
 import { apiFetch } from "@/lib/api";
-
-type Libro = {
-  googleBooksId: string;
-  titulo: string;
-  autores: string[];
-  isbn: string | null;
-  portadaUrl: string | null;
-  anioPublicacion: number | null;
-  paginas: number | null;
-};
+import { fichaTecnica, type Libro } from "@/lib/tipos";
 
 export default function Buscar() {
   const { usuario, cargando } = useRequiereSesion();
@@ -83,36 +76,25 @@ export default function Buscar() {
       {resultados && resultados.length > 0 && (
         <ul className="m-0 list-none p-0">
           {resultados.map((libro) => (
-            <li
-              key={libro.googleBooksId}
-              className="flex gap-5 border-b border-linea py-5 first:border-t"
-            >
-              {libro.portadaUrl ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
-                  src={libro.portadaUrl}
-                  alt=""
-                  className="h-[84px] w-14 shrink-0 rounded-xs object-cover"
-                />
-              ) : (
-                <div className="h-[84px] w-14 shrink-0 rounded-xs bg-linea" />
-              )}
+            <li key={libro.googleBooksId} className="border-b border-linea first:border-t">
+              <Link
+                href={`/libro/${libro.googleBooksId}`}
+                className="flex gap-5 py-5 no-underline"
+              >
+                <Portada libro={libro} ancho={56} alto={84} />
 
-              <div className="min-w-0">
-                <p className="m-0 text-[17px] font-medium leading-snug">{libro.titulo}</p>
-                <p className="mb-1.5 mt-1 text-[13px] text-piedra">
-                  {libro.autores.join(", ") || "Autor desconocido"}
-                </p>
-                <p className="m-0 text-[11px] tabular-nums tracking-[0.03em] text-piedra">
-                  {[
-                    libro.anioPublicacion,
-                    libro.paginas && `${libro.paginas} páginas`,
-                    libro.isbn && `ISBN ${libro.isbn}`,
-                  ]
-                    .filter(Boolean)
-                    .join(" — ")}
-                </p>
-              </div>
+                <div className="min-w-0">
+                  <p className="m-0 text-[17px] font-medium leading-snug">
+                    {libro.titulo}
+                  </p>
+                  <p className="mb-1.5 mt-1 text-[13px] text-piedra">
+                    {libro.autores.join(", ") || "Autor desconocido"}
+                  </p>
+                  <p className="m-0 text-[11px] tabular-nums tracking-[0.03em] text-piedra">
+                    {fichaTecnica(libro)}
+                  </p>
+                </div>
+              </Link>
             </li>
           ))}
         </ul>

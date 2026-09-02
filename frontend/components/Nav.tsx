@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 import { useSesion } from "./SesionProvider";
 
 const secciones = [
-  { label: "Biblioteca", href: null },
+  { label: "Biblioteca", href: "/biblioteca" },
   { label: "Descubrir", href: "/buscar" },
   { label: "Perfil", href: null },
 ];
