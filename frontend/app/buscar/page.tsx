@@ -81,7 +81,7 @@ export default function Buscar() {
                 href={`/libro/${libro.googleBooksId}`}
                 className="flex gap-5 py-5 no-underline"
               >
-                <Portada libro={libro} ancho={56} alto={84} />
+                <Portada libro={libro} tamano="h-[84px] w-14" />
 
                 <div className="min-w-0">
                   <p className="m-0 text-[17px] font-medium leading-snug">

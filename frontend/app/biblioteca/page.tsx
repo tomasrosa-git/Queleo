@@ -52,7 +52,7 @@ export default function Biblioteca() {
         Tus libros
       </h1>
 
-      <div className="mb-8 flex gap-6 border-b border-linea pb-4 text-[13px]">
+      <div className="mb-8 flex flex-wrap gap-x-5 gap-y-2 border-b border-linea pb-4 text-[13px] sm:gap-x-6">
         {FILTROS.map(({ valor, etiqueta }) => (
           <button
             key={etiqueta}
@@ -92,7 +92,7 @@ export default function Biblioteca() {
                 href={`/libro/${entrada.libro.googleBooksId}`}
                 className="flex gap-5 py-5 no-underline"
               >
-                <Portada libro={entrada.libro} ancho={56} alto={84} />
+                <Portada libro={entrada.libro} tamano="h-[84px] w-14" />
 
                 <div className="min-w-0 flex-1">
                   <p className="m-0 text-[17px] font-medium leading-snug">

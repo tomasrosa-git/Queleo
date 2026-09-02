@@ -14,7 +14,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     <html lang="es" className="h-full">
       <body className="min-h-full">
         <SesionProvider>
-          <div className="mx-auto max-w-[760px] px-7 pb-16">
+          <div className="mx-auto max-w-[760px] px-5 pb-16 sm:px-7">
             <Nav />
             {children}
           </div>
