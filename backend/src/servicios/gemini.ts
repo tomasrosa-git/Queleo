@@ -7,7 +7,10 @@ const API = "https://generativelanguage.googleapis.com/v1beta/interactions";
 // cuelgues sin respuesta). La propia API, al pedirle 2.5-flash, recomendó
 // 3.6-flash para cuentas nuevas — se fija ese en vez del alias "latest".
 const MODELO = process.env.GEMINI_MODELO ?? "gemini-3.6-flash";
-const TIMEOUT_MS = 30_000;
+// Una respuesta corta (un turno de entrevista) vuelve en 8-15s, pero pedir
+// varias recomendaciones con su razonamiento genera mucho más texto y pasa
+// los 30s con facilidad: cada llamador fija su propio margen.
+const TIMEOUT_POR_DEFECTO_MS = 30_000;
 
 export type RolGemini = "user" | "model";
 export type TurnoGemini = { rol: RolGemini; texto: string };
@@ -74,19 +77,24 @@ type Pedido<T> = {
   turnos: TurnoGemini[];
   esquema: Record<string, unknown>;
   schema: z.ZodType<T>;
+  timeoutMs?: number;
 };
 
 const MENSAJE_SATURADO =
-  "Las funciones con IA están saturadas o sin cupo por ahora. Probá de nuevo en un momento.";
+  "Las funciones con IA están saturadas o sin cupo por ahora. Probá de nuevo en un minuto.";
 
-async function llamar(sistema: string, turnos: TurnoGemini[], esquema: Record<string, unknown>) {
+async function llamar(
+  sistema: string,
+  turnos: TurnoGemini[],
+  esquema: Record<string, unknown>,
+  timeoutMs: number,
+) {
   const apiKey = process.env.GEMINI_API_KEY!;
-  const corte = AbortSignal.timeout(TIMEOUT_MS);
 
   return fetch(API, {
     method: "POST",
     headers: { "Content-Type": "application/json", "x-goog-api-key": apiKey },
-    signal: corte,
+    signal: AbortSignal.timeout(timeoutMs),
     body: JSON.stringify({
       model: MODELO,
       input: turnos.map(comoStep),
@@ -105,24 +113,43 @@ async function llamar(sistema: string, turnos: TurnoGemini[], esquema: Record<st
 // "usually temporary" según el propio mensaje de Google) con frecuencia
 // real, no sólo en el peor caso — confirmado con la API en vivo. Un reintento
 // después de una pausa corta resuelve la mayoría sin que el usuario lo note.
-export async function generar<T>({ sistema, turnos, esquema, schema }: Pedido<T>): Promise<T> {
+// Un timeout no se reintenta: ya se esperó el margen completo y repetirlo
+// duplicaría la espera del usuario para el mismo resultado.
+export async function generar<T>({
+  sistema,
+  turnos,
+  esquema,
+  schema,
+  timeoutMs = TIMEOUT_POR_DEFECTO_MS,
+}: Pedido<T>): Promise<T> {
   if (!process.env.GEMINI_API_KEY) {
     throw new AppError(503, "Las funciones con IA no están configuradas.");
   }
 
   let res: Response;
   try {
-    res = await llamar(sistema, turnos, esquema);
-    if (!res.ok && res.status !== 400) {
-      await new Promise((r) => setTimeout(r, 3000));
-      res = await llamar(sistema, turnos, esquema);
-    }
+    res = await llamar(sistema, turnos, esquema, timeoutMs);
   } catch (err) {
     console.error("Gemini no respondió a tiempo", err);
     throw new AppError(503, MENSAJE_SATURADO);
   }
 
+  // Un 5xx es demanda momentánea y suele pasar en segundos. Un 429 es cuota
+  // por minuto — Google pide esperar ~20s, así que reintentar acá sólo haría
+  // esperar al usuario para fallar igual.
+  if (res.status >= 500) {
+    console.error("Gemini respondió", res.status, "— reintentando");
+    await new Promise((r) => setTimeout(r, 3000));
+    try {
+      res = await llamar(sistema, turnos, esquema, timeoutMs);
+    } catch (err) {
+      console.error("Gemini no respondió a tiempo en el reintento", err);
+      throw new AppError(503, MENSAJE_SATURADO);
+    }
+  }
+
   if (res.status === 429 || res.status >= 500) {
+    console.error("Gemini saturado", res.status, (await res.text()).slice(0, 300));
     throw new AppError(503, MENSAJE_SATURADO);
   }
   if (!res.ok) {
