@@ -4,6 +4,7 @@ import cors from "cors";
 import express from "express";
 import { errorHandler } from "./middleware/errorHandler.js";
 import { authRouter } from "./routes/auth.js";
+import { bibliotecaRouter } from "./routes/biblioteca.js";
 import { healthRouter } from "./routes/health.js";
 import { librosRouter } from "./routes/libros.js";
 
@@ -21,6 +22,7 @@ app.use(cookieParser());
 app.use(healthRouter);
 app.use(authRouter);
 app.use(librosRouter);
+app.use(bibliotecaRouter);
 
 app.use(errorHandler);
 
