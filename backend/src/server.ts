@@ -8,6 +8,7 @@ import { bibliotecaRouter } from "./routes/biblioteca.js";
 import { healthRouter } from "./routes/health.js";
 import { librosRouter } from "./routes/libros.js";
 import { perfilRouter } from "./routes/perfil.js";
+import { recomendacionesRouter } from "./routes/recomendaciones.js";
 
 const app = express();
 
@@ -25,6 +26,7 @@ app.use(authRouter);
 app.use(librosRouter);
 app.use(bibliotecaRouter);
 app.use(perfilRouter);
+app.use(recomendacionesRouter);
 
 app.use(errorHandler);
 

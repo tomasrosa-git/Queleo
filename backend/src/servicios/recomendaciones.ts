@@ -1,0 +1,144 @@
+import { z } from "zod";
+import { elegirCoincidencia } from "../lib/coincidencia.js";
+import { registrarLlamado, verificarCupo } from "../lib/consumoGemini.js";
+import { prisma } from "../lib/prisma.js";
+import { AppError } from "../middleware/errorHandler.js";
+import { generar as generarConIa } from "./gemini.js";
+import * as googleBooks from "./googleBooks.js";
+import { cachearLibro } from "./libros.js";
+
+// Se piden más de las que se muestran porque algunas se caen al no encontrarse
+// en el catálogo.
+const A_PEDIR = 8;
+const A_MOSTRAR = 5;
+
+const SISTEMA = `Sos quien recomienda libros en Queleo, a partir del perfil de lectura de una persona concreta.
+
+Escribís en español rioplatense, con voseo, en un registro sobrio y preciso: nada de exclamaciones, emojis ni entusiasmo de contratapa. Hablás de libros como alguien que los leyó.
+
+Para cada libro que recomendás:
+- El razonamiento se apoya en algo puntual del perfil o de lo que la persona ya calificó, y lo dice explícitamente. "Porque te gusta la ficción literaria" no sirve; "porque los dos libros de estructura fragmentada que calificaste con 9 comparten este mismo procedimiento" sí.
+- El reparo es el punto donde el libro podría no funcionarle, según su propio patrón. Si no encontrás uno honesto, va en null: no inventes una objeción de compromiso.
+
+Recomendá libros que existan y sean encontrables por título y autor. No recomiendes ninguno que la persona ya tenga en su biblioteca.`;
+
+const esquema = {
+  type: "object",
+  properties: {
+    recomendaciones: {
+      type: "array",
+      items: {
+        type: "object",
+        properties: {
+          titulo: { type: "string" },
+          autor: { type: "string" },
+          razonamiento: { type: "string" },
+          reparo: { type: "string", nullable: true },
+        },
+        required: ["titulo", "autor", "razonamiento"],
+      },
+    },
+  },
+  required: ["recomendaciones"],
+};
+
+const propuestas = z.object({
+  recomendaciones: z.array(
+    z.object({
+      titulo: z.string().min(1),
+      autor: z.string().min(1),
+      razonamiento: z.string().min(1),
+      reparo: z.string().nullable().optional(),
+    }),
+  ),
+});
+
+export function listar(usuarioId: string) {
+  return prisma.recomendacion.findMany({
+    where: { usuarioId },
+    include: { libro: true },
+    orderBy: { orden: "asc" },
+  });
+}
+
+async function contexto(usuarioId: string) {
+  const perfil = await prisma.perfilLector.findUnique({ where: { usuarioId } });
+  if (!perfil) {
+    throw new AppError(409, "Primero armá tu perfil lector en la sección Perfil.");
+  }
+
+  const entradas = await prisma.entradaBiblioteca.findMany({
+    where: { usuarioId },
+    include: { libro: true },
+    orderBy: [{ rating: "desc" }, { actualizadaEn: "desc" }],
+    take: 25,
+  });
+
+  const biblioteca = entradas
+    .map((entrada) => {
+      const autores = entrada.libro.autores.join(", ") || "autor desconocido";
+      const puntaje = entrada.rating ? ` — ${entrada.rating}/10` : "";
+      const resena = entrada.resena ? ` — anotó: "${entrada.resena}"` : "";
+      return `- ${entrada.libro.titulo} (${autores})${puntaje}${resena}`;
+    })
+    .join("\n");
+
+  return `Perfil del lector:
+${perfil.resumen}
+
+Géneros: ${perfil.generos.join(", ") || "sin datos"}
+Autores afines: ${perfil.autores.join(", ") || "sin datos"}
+Patrones: ${perfil.patrones.join(" · ") || "sin datos"}
+
+Ya tiene en su biblioteca (no los recomiendes de nuevo):
+${biblioteca || "(biblioteca vacía)"}
+
+Recomendá ${A_PEDIR} libros.`;
+}
+
+export async function regenerar(usuarioId: string) {
+  await verificarCupo();
+
+  const salida = await generarConIa({
+    sistema: SISTEMA,
+    turnos: [{ rol: "user", texto: await contexto(usuarioId) }],
+    esquema,
+    schema: propuestas,
+    // Ocho recomendaciones con su razonamiento son bastante más texto que un
+    // turno de entrevista: con 30s se corta antes de que el modelo termine.
+    timeoutMs: 120_000,
+  });
+  await registrarLlamado();
+
+  // La IA puede proponer un libro que no existe o que el catálogo no encuentra;
+  // esas se descartan en vez de mostrarse sin tapa ni ficha.
+  const halladas = await Promise.all(
+    salida.recomendaciones.map(async (propuesta) => {
+      const resultados = await googleBooks.buscar(`${propuesta.titulo} ${propuesta.autor}`);
+      const libro = elegirCoincidencia(propuesta, resultados);
+      return libro ? { propuesta, libro } : null;
+    }),
+  );
+
+  const validas = halladas.filter((r) => r !== null).slice(0, A_MOSTRAR);
+  if (validas.length === 0) {
+    throw new AppError(502, "No pudimos encontrar los libros sugeridos en el catálogo.");
+  }
+
+  const libros = await Promise.all(validas.map(({ libro }) => cachearLibro(libro)));
+
+  await prisma.$transaction([
+    prisma.recomendacion.deleteMany({ where: { usuarioId } }),
+    prisma.recomendacion.createMany({
+      data: validas.map(({ propuesta }, i) => ({
+        usuarioId,
+        libroId: libros[i].id,
+        razonamiento: propuesta.razonamiento,
+        reparo: propuesta.reparo ?? null,
+        orden: i,
+      })),
+    }),
+  ]);
+
+  return listar(usuarioId);
+}
