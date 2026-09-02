@@ -26,3 +26,15 @@ model RefreshToken {
 
   @@index([userId])
 }
+
+model Libro {
+  id              String   @id @default(uuid())
+  googleBooksId   String   @unique
+  titulo          String
+  autores         String[]
+  isbn            String?
+  portadaUrl      String?
+  anioPublicacion Int?
+  paginas         Int?
+  cacheadoEn      DateTime @default(now())
+}
