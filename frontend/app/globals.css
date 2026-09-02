@@ -21,6 +21,15 @@
   --radius-3xl: 2px;
 }
 
+/* Los campos de texto marcan el foco con el borde; el resto lo hace con un
+   contorno, para que se pueda navegar todo con teclado. */
+a:focus-visible,
+button:focus-visible,
+select:focus-visible {
+  outline: 2px solid var(--color-tinta);
+  outline-offset: 2px;
+}
+
 body {
   background: var(--color-papel);
   color: var(--color-tinta);

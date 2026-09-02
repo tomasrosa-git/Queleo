@@ -80,7 +80,7 @@ export default function Descubrir() {
             >
               <div className="mb-4 flex gap-5">
                 <Link href={`/libro/${recomendacion.libro.googleBooksId}`} className="shrink-0">
-                  <Portada libro={recomendacion.libro} ancho={76} alto={114} />
+                  <Portada libro={recomendacion.libro} tamano="h-[114px] w-[76px]" />
                 </Link>
 
                 <div className="min-w-0 flex-1">

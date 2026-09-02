@@ -50,7 +50,7 @@ export default function FichaLibro() {
   return (
     <main>
       <div className="mb-11 flex flex-col gap-10 sm:flex-row">
-        <Portada libro={libro} ancho={168} alto={252} />
+        <Portada libro={libro} tamano="h-[210px] w-[140px] sm:h-[252px] sm:w-[168px]" />
 
         <div className="min-w-0 flex-1">
           <h1 className="mb-2 text-[32px] font-bold leading-tight tracking-tight">
