@@ -7,6 +7,7 @@ import { errorHandler } from "./middleware/errorHandler.js";
 import { authRouter } from "./routes/auth.js";
 import { bibliotecaRouter } from "./routes/biblioteca.js";
 import { healthRouter } from "./routes/health.js";
+import { importacionRouter } from "./routes/importacion.js";
 import { librosRouter } from "./routes/libros.js";
 import { pairingRouter } from "./routes/pairing.js";
 import { perfilRouter } from "./routes/perfil.js";
@@ -28,13 +29,14 @@ app.use(
     credentials: true,
   }),
 );
-app.use(express.json());
+app.use(express.json({ limit: "3mb" }));
 app.use(cookieParser());
 
 app.use(healthRouter);
 app.use(authRouter);
 app.use(librosRouter);
 app.use(bibliotecaRouter);
+app.use(importacionRouter);
 app.use(perfilRouter);
 app.use(recomendacionesRouter);
 app.use(pairingRouter);

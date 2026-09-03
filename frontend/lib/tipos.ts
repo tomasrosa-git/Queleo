@@ -84,3 +84,19 @@ export type Pairing = {
   lectura: string;
   sugerencias: { libro: Libro; vinculo: string }[];
 };
+
+export type LibroImportado = {
+  titulo: string;
+  autor: string;
+  isbn: string | null;
+  rating: number | null;
+  resena: string | null;
+  estado: EstadoLectura;
+};
+
+export type ResultadoImportacion = {
+  importados: number;
+  omitidos: number;
+  noEncontrados: string[];
+  fallaron: string[];
+};
