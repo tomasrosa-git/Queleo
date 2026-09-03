@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
+import { Pairing } from "@/components/Pairing";
 import { Portada } from "@/components/Portada";
 import { useRequiereSesion } from "@/components/SesionProvider";
 import { apiFetch } from "@/lib/api";
@@ -72,6 +73,8 @@ export default function Buscar() {
           No encontramos nada para “{consulta}”.
         </p>
       )}
+
+      {!resultados && !buscando && !error && <Pairing />}
 
       {resultados && resultados.length > 0 && (
         <ul className="m-0 list-none p-0">
