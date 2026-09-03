@@ -119,4 +119,16 @@ describe("elegirCoincidencia", () => {
   it("devuelve null con una lista vacía", () => {
     expect(elegirCoincidencia(propuesta, [])).toBeNull();
   });
+
+  it("rechaza el libro equivocado que a veces devuelve una búsqueda por ISBN", () => {
+    // Caso real: buscar isbn:9788433920492, que es de Los detectives
+    // salvajes, devuelve una novela de Martin Amis. Sin este filtro se
+    // importaría ese libro con el puntaje y la reseña de otro.
+    const elegido = elegirCoincidencia(
+      { titulo: "Los detectives salvajes", autor: "Roberto Bolaño" },
+      [libro("Dinero: Carta de un Suicida", ["Martin Amis"], { isbn: "9788433920492" })],
+    );
+
+    expect(elegido).toBeNull();
+  });
 });
