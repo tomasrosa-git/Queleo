@@ -1,3 +1,4 @@
+import { modoFixture } from "./fixturesGemini.js";
 import { prisma } from "./prisma.js";
 import { AppError } from "../middleware/errorHandler.js";
 
@@ -8,6 +9,12 @@ function hoy() {
 }
 
 export async function verificarCupo() {
+  // Trabajar contra respuestas grabadas no gasta cupo, así que tampoco debe
+  // contra el contador ni quedar bloqueado por él.
+  if (modoFixture() === "usar") {
+    return;
+  }
+
   const consumo = await prisma.consumoGemini.findUnique({ where: { fecha: hoy() } });
 
   if ((consumo?.llamados ?? 0) >= TECHO_DIARIO) {
@@ -19,6 +26,10 @@ export async function verificarCupo() {
 }
 
 export async function registrarLlamado() {
+  if (modoFixture() === "usar") {
+    return;
+  }
+
   const fecha = hoy();
 
   await prisma.consumoGemini.upsert({

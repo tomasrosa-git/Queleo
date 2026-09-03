@@ -1,0 +1,26 @@
+{
+  "id": "v1_grabado_en_desarrollo",
+  "status": "completed",
+  "model": "gemini-3.6-flash",
+  "object": "interaction",
+  "usage": {
+    "total_input_tokens": 412,
+    "total_output_tokens": 48,
+    "total_tokens": 460
+  },
+  "steps": [
+    {
+      "type": "thought",
+      "signature": "EvEFCu4FAQw_grabado"
+    },
+    {
+      "type": "model_output",
+      "content": [
+        {
+          "type": "text",
+          "text": "{\"respuesta\": \"¿Qué tiene que tener una novela de estructura compleja o fragmentada para que el dispositivo no se sienta como un mero truco o un ejercicio formal?\", \"suficiente\": false}"
+        }
+      ]
+    }
+  ]
+}

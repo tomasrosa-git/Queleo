@@ -1,0 +1,26 @@
+{
+  "id": "v1_grabado_en_desarrollo",
+  "status": "completed",
+  "model": "gemini-3.6-flash",
+  "object": "interaction",
+  "usage": {
+    "total_input_tokens": 630,
+    "total_output_tokens": 187,
+    "total_tokens": 817
+  },
+  "steps": [
+    {
+      "type": "thought",
+      "signature": "EvEFCu4FAQw_grabado"
+    },
+    {
+      "type": "model_output",
+      "content": [
+        {
+          "type": "text",
+          "text": "{\"resumen\": \"Buscás ficción literaria contemporánea donde la estructura narrativa o la voz narrativa funcionen como el eje vertebrador de la novela. Te interesan los textos que juegan con múltiples perspectivas o versiones de una misma historia, en especial cuando el desenlace reordena y resignifica la lectura previa.\", \"generos\": [\"Ficción literaria contemporánea\", \"Ciencia ficción especulativa\"], \"autores\": [\"Hernan Diaz\", \"Kazuo Ishiguro\"], \"patrones\": [\"Puntuás alto las novelas cuya estructura fragmentada o por capas cobra sentido orgánico hacia el final.\", \"Valorás las obras cuya solidez descansa en el rigor y el tono de la voz narrativa.\"]}"
+        }
+      ]
+    }
+  ]
+}
