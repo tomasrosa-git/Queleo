@@ -16,6 +16,12 @@ validarEntorno();
 
 const app = express();
 
+// En Render hay un proxy (Cloudflare) delante, así que sin esto req.ip es
+// siempre la del proxy y el límite por IP del login se cuenta global: diez
+// intentos fallidos de una persona dejarían a todos afuera. Es un salto
+// porque sólo confía en ese proxy, no en cualquier X-Forwarded-For.
+app.set("trust proxy", 1);
+
 app.use(
   cors({
     origin: process.env.CORS_ORIGIN,
