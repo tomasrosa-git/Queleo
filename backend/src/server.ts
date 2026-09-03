@@ -7,6 +7,7 @@ import { authRouter } from "./routes/auth.js";
 import { bibliotecaRouter } from "./routes/biblioteca.js";
 import { healthRouter } from "./routes/health.js";
 import { librosRouter } from "./routes/libros.js";
+import { pairingRouter } from "./routes/pairing.js";
 import { perfilRouter } from "./routes/perfil.js";
 import { recomendacionesRouter } from "./routes/recomendaciones.js";
 
@@ -27,6 +28,7 @@ app.use(librosRouter);
 app.use(bibliotecaRouter);
 app.use(perfilRouter);
 app.use(recomendacionesRouter);
+app.use(pairingRouter);
 
 app.use(errorHandler);
 
