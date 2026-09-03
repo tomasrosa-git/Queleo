@@ -14,7 +14,17 @@ const limiteIa = rateLimiter({
   mensaje: "Esperá unos minutos antes de pedir otro análisis.",
 });
 
-librosRouter.get("/libros/buscar", requireAuth, async (req, res) => {
+// Consultar el catálogo gasta cuota de Google Books (unas mil por día), y
+// estos son los únicos endpoints que la consumen sin pasar por la IA. El
+// techo es alto a propósito: quien arma su biblioteca busca seguido, así que
+// esto frena un bucle, no el uso normal.
+const limiteCatalogo = rateLimiter({
+  ventanaMs: 60 * 1000,
+  maximo: 30,
+  mensaje: "Demasiadas búsquedas seguidas. Esperá unos segundos.",
+});
+
+librosRouter.get("/libros/buscar", requireAuth, limiteCatalogo, async (req, res) => {
   const consulta = String(req.query.q ?? "").trim();
   if (!consulta) {
     throw new AppError(400, "Falta la consulta de búsqueda");
@@ -23,7 +33,7 @@ librosRouter.get("/libros/buscar", requireAuth, async (req, res) => {
   res.json({ resultados: await googleBooks.buscar(consulta) });
 });
 
-librosRouter.get("/libros/:googleBooksId", requireAuth, async (req, res) => {
+librosRouter.get("/libros/:googleBooksId", requireAuth, limiteCatalogo, async (req, res) => {
   res.json({ libro: await asegurarLibro(String(req.params.googleBooksId)) });
 });
 
