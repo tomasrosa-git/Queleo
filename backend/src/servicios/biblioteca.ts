@@ -1,4 +1,5 @@
 import type { EstadoLectura } from "@prisma/client";
+import { calcularEstadisticas } from "../lib/estadisticas.js";
 import { prisma } from "../lib/prisma.js";
 import { AppError } from "../middleware/errorHandler.js";
 import { asegurarLibro } from "./libros.js";
@@ -46,4 +47,28 @@ export async function eliminar(usuarioId: string, googleBooksId: string) {
   }
 
   await prisma.entradaBiblioteca.delete({ where: { id: entrada.id } });
+}
+
+export async function estadisticas(usuarioId: string) {
+  const entradas = await prisma.entradaBiblioteca.findMany({
+    where: { usuarioId },
+    select: {
+      estado: true,
+      rating: true,
+      libro: { select: { autores: true, paginas: true, anioPublicacion: true } },
+    },
+  });
+
+  return calcularEstadisticas(entradas);
+}
+
+// Los mejor puntuados, para el estante: es lo que representa el gusto de la
+// persona, no lo último que agregó.
+export function destacados(usuarioId: string, cuantos: number) {
+  return prisma.entradaBiblioteca.findMany({
+    where: { usuarioId, estado: "LEIDO", rating: { not: null } },
+    include: { libro: true },
+    orderBy: [{ rating: "desc" }, { actualizadaEn: "desc" }],
+    take: cuantos,
+  });
 }
