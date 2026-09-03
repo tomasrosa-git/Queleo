@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { createContext, useContext, useEffect, useState } from "react";
-import { apiFetch, guardarToken } from "@/lib/api";
+import { alCaerLaSesion, apiFetch, guardarToken } from "@/lib/api";
 
 export type Usuario = { id: string; email: string; name: string };
 
@@ -26,6 +26,15 @@ export function SesionProvider({ children }: { children: React.ReactNode }) {
     guardarToken(accessToken);
     setUsuario(user);
   }
+
+  // Si la sesión no se puede renovar, la UI tiene que enterarse: si no,
+  // el nav sigue mostrando al usuario como conectado.
+  useEffect(() => {
+    alCaerLaSesion(() => {
+      guardarToken(null);
+      setUsuario(null);
+    });
+  }, []);
 
   useEffect(() => {
     apiFetch<Respuesta>("/auth/refresh", { method: "POST" })
