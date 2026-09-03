@@ -7,18 +7,19 @@ import { generar as generarConIa } from "./gemini.js";
 import * as googleBooks from "./googleBooks.js";
 import { cachearLibro } from "./libros.js";
 
-// Se piden más de las que se muestran porque algunas se caen al no encontrarse
-// en el catálogo.
-const A_PEDIR = 8;
-const A_MOSTRAR = 5;
+// Se piden un par más de las que se muestran porque algunas se caen al no
+// encontrarse en el catálogo. Pedir muchas más era contraproducente: con ocho,
+// el volumen de texto hacía que el modelo no terminara ni en dos minutos.
+const A_PEDIR = 5;
+const A_MOSTRAR = 4;
 
 const SISTEMA = `Sos quien recomienda libros en Queleo, a partir del perfil de lectura de una persona concreta.
 
 Escribís en español rioplatense, con voseo, en un registro sobrio y preciso: nada de exclamaciones, emojis ni entusiasmo de contratapa. Hablás de libros como alguien que los leyó.
 
 Para cada libro que recomendás:
-- El razonamiento se apoya en algo puntual del perfil o de lo que la persona ya calificó, y lo dice explícitamente. "Porque te gusta la ficción literaria" no sirve; "porque los dos libros de estructura fragmentada que calificaste con 9 comparten este mismo procedimiento" sí.
-- El reparo es el punto donde el libro podría no funcionarle, según su propio patrón. Si no encontrás uno honesto, va en null: no inventes una objeción de compromiso.
+- El razonamiento son una o dos oraciones, apoyadas en algo puntual del perfil o de lo que la persona ya calificó, y lo dice explícitamente. "Porque te gusta la ficción literaria" no sirve; "porque los dos libros de estructura fragmentada que calificaste con 9 comparten este mismo procedimiento" sí.
+- El reparo es una oración: el punto donde el libro podría no funcionarle, según su propio patrón. Si no encontrás uno honesto, va en null: no inventes una objeción de compromiso.
 
 Recomendá libros que existan y sean encontrables por título y autor. No recomiendes ninguno que la persona ya tenga en su biblioteca.`;
 
@@ -107,20 +108,27 @@ export async function regenerar(usuarioId: string) {
     // Ocho recomendaciones con su razonamiento son bastante más texto que un
     // turno de entrevista: con 30s se corta antes de que el modelo termine.
     timeoutMs: 120_000,
+    fixture: "recomendaciones",
   });
   await registrarLlamado();
 
   // La IA puede proponer un libro que no existe o que el catálogo no encuentra;
   // esas se descartan en vez de mostrarse sin tapa ni ficha.
-  const halladas = await Promise.all(
-    salida.recomendaciones.map(async (propuesta) => {
-      const resultados = await googleBooks.buscar(`${propuesta.titulo} ${propuesta.autor}`);
-      const libro = elegirCoincidencia(propuesta, resultados);
-      return libro ? { propuesta, libro } : null;
-    }),
-  );
+  // Las búsquedas van de a una: cinco en paralelo son un pico que Google Books
+  // rechaza, y al lado de los ~30s que tarda la IA no se nota la diferencia.
+  const validas = [];
+  for (const propuesta of salida.recomendaciones) {
+    if (validas.length === A_MOSTRAR) {
+      break;
+    }
 
-  const validas = halladas.filter((r) => r !== null).slice(0, A_MOSTRAR);
+    const resultados = await googleBooks.buscar(`${propuesta.titulo} ${propuesta.autor}`);
+    const libro = elegirCoincidencia(propuesta, resultados);
+    if (libro) {
+      validas.push({ propuesta, libro });
+    }
+  }
+
   if (validas.length === 0) {
     throw new AppError(502, "No pudimos encontrar los libros sugeridos en el catálogo.");
   }

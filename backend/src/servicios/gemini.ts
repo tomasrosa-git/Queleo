@@ -1,4 +1,9 @@
 import type { z } from "zod";
+import {
+  guardarFixture,
+  leerFixture,
+  modoFixture,
+} from "../lib/fixturesGemini.js";
 import { AppError } from "../middleware/errorHandler.js";
 
 const API = "https://generativelanguage.googleapis.com/v1beta/interactions";
@@ -33,8 +38,9 @@ type Respuesta = {
   }[];
 };
 
-export function extraerTexto(respuesta: Respuesta): string {
-  const texto = (respuesta.steps ?? [])
+export function extraerTexto(respuesta: Respuesta | unknown): string {
+  const { steps } = (respuesta ?? {}) as Respuesta;
+  const texto = (steps ?? [])
     .filter((paso) => paso.type === "model_output")
     .flatMap((paso) => paso.content ?? [])
     .filter((parte) => parte.type === "text")
@@ -78,6 +84,8 @@ type Pedido<T> = {
   esquema: Record<string, unknown>;
   schema: z.ZodType<T>;
   timeoutMs?: number;
+  // Nombre con el que se graba y se recupera esta llamada en fixtures/gemini.
+  fixture: string;
 };
 
 const MENSAJE_SATURADO =
@@ -121,7 +129,14 @@ export async function generar<T>({
   esquema,
   schema,
   timeoutMs = TIMEOUT_POR_DEFECTO_MS,
+  fixture,
 }: Pedido<T>): Promise<T> {
+  const modo = modoFixture();
+
+  if (modo === "usar") {
+    return parsearJson(extraerTexto(await leerFixture(fixture)), schema);
+  }
+
   if (!process.env.GEMINI_API_KEY) {
     throw new AppError(503, "Las funciones con IA no están configuradas.");
   }
@@ -157,5 +172,10 @@ export async function generar<T>({
     throw new AppError(502, "No pudimos consultar a la IA en este momento.");
   }
 
-  return parsearJson(extraerTexto(await res.json()), schema);
+  const cruda = await res.json();
+  if (modo === "grabar") {
+    await guardarFixture(fixture, cruda);
+  }
+
+  return parsearJson(extraerTexto(cruda), schema);
 }

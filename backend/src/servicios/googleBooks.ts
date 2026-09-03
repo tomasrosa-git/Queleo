@@ -9,7 +9,8 @@ function conKey(url: string) {
   return key ? `${url}&key=${key}` : url;
 }
 
-function fallo(status: number): never {
+function fallo(status: number, cuerpo?: string): never {
+  console.error("Google Books respondió", status, (cuerpo ?? "").slice(0, 200));
   if (status === 429) {
     throw new AppError(
       503,
@@ -91,7 +92,7 @@ export async function buscar(consulta: string): Promise<LibroExterno[]> {
     conKey(`${API}?q=${encodeURIComponent(consulta)}&maxResults=20`),
   );
   if (!res.ok) {
-    fallo(res.status);
+    fallo(res.status, await res.text());
   }
 
   return parsearRespuesta(await res.json());
@@ -105,7 +106,7 @@ export async function porId(googleBooksId: string): Promise<LibroExterno | null>
     return null;
   }
   if (!res.ok) {
-    fallo(res.status);
+    fallo(res.status, await res.text());
   }
 
   return parsearVolumen(await res.json());

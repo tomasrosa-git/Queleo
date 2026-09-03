@@ -120,6 +120,7 @@ export async function responder(usuarioId: string, mensaje: string) {
     turnos,
     esquema: esquemaOnboarding,
     schema: respuestaOnboarding,
+    fixture: "onboarding",
   });
 
   await registrarLlamado();
@@ -153,6 +154,7 @@ export async function derivar(usuarioId: string) {
     ],
     esquema: esquemaPerfil,
     schema: perfilDerivado,
+    fixture: "perfil",
   });
 
   await registrarLlamado();
