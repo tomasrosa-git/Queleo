@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { BotonGoogle } from "@/components/BotonGoogle";
 import { Campo } from "@/components/Campo";
 import { useSesion, useSoloInvitados } from "@/components/SesionProvider";
 
@@ -32,6 +33,8 @@ export default function Ingresar() {
   return (
     <main className="max-w-[380px]">
       <h1 className="mb-8 text-[27px] font-bold tracking-tight">Ingresar</h1>
+
+      <BotonGoogle alFallar={setError} />
 
       <form onSubmit={enviar} className="flex flex-col gap-5">
         <Campo etiqueta="Email" tipo="email" valor={email} onChange={setEmail} autoComplete="email" />
