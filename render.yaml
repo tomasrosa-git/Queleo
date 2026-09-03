@@ -1,0 +1,36 @@
+services:
+  - type: web
+    name: queleo-api
+    runtime: node
+    plan: free
+    # Render no tiene región en Sudamérica: Virginia es la más cercana a la
+    # base, que está en São Paulo.
+    region: virginia
+    rootDir: backend
+    buildCommand: pnpm install --frozen-lockfile && pnpm exec prisma migrate deploy && pnpm run build
+    startCommand: pnpm start
+    # Pega a la base, así que si Supabase deja de responder el servicio se
+    # reporta caído en vez de aceptar tráfico que va a fallar igual.
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: GEMINI_MODELO
+        value: gemini-flash-lite-latest
+      - key: GEMINI_LIMITE_DIARIO
+        value: "20"
+      # Se cargan a mano en el dashboard de Render.
+      - key: DATABASE_URL
+        sync: false
+      - key: DIRECT_URL
+        sync: false
+      - key: JWT_SECRET
+        sync: false
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: GOOGLE_BOOKS_API_KEY
+        sync: false
+      # El dominio de Vercel, sin barra final. Sin esto el navegador bloquea
+      # el login: la cookie de sesión viaja cross-site.
+      - key: CORS_ORIGIN
+        sync: false

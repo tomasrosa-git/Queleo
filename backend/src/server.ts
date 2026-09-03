@@ -2,6 +2,7 @@ import "dotenv/config";
 import cookieParser from "cookie-parser";
 import cors from "cors";
 import express from "express";
+import { validarEntorno } from "./lib/entorno.js";
 import { errorHandler } from "./middleware/errorHandler.js";
 import { authRouter } from "./routes/auth.js";
 import { bibliotecaRouter } from "./routes/biblioteca.js";
@@ -10,6 +11,8 @@ import { librosRouter } from "./routes/libros.js";
 import { pairingRouter } from "./routes/pairing.js";
 import { perfilRouter } from "./routes/perfil.js";
 import { recomendacionesRouter } from "./routes/recomendaciones.js";
+
+validarEntorno();
 
 const app = express();
 
