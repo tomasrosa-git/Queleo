@@ -28,6 +28,8 @@ export type LibroExterno = {
   portadaUrl: string | null;
   anioPublicacion: number | null;
   paginas: number | null;
+  ratingPublico: number | null;
+  cantidadRatings: number | null;
 };
 
 type Identificador = { type?: string; identifier?: string };
@@ -43,8 +45,15 @@ type Volumen = {
     pageCount?: number;
     industryIdentifiers?: Identificador[];
     imageLinks?: Portada;
+    averageRating?: number;
+    ratingsCount?: number;
   };
 };
+
+// Google Books trae el promedio público en muy pocos volúmenes y casi siempre
+// con un puñado de votos, así que por debajo de este mínimo no se muestra:
+// un "4,5 de 5" salido de dos personas no es un dato, es ruido.
+const RATINGS_MINIMOS = 3;
 
 function extraerIsbn(ids?: Identificador[]) {
   const isbn13 = ids?.find((i) => i.type === "ISBN_13")?.identifier;
@@ -78,6 +87,14 @@ export function parsearVolumen(volumen: Volumen): LibroExterno | null {
     portadaUrl: normalizarPortada(info.imageLinks),
     anioPublicacion: extraerAnio(info.publishedDate),
     paginas: info.pageCount && info.pageCount > 0 ? info.pageCount : null,
+    ratingPublico:
+      info.averageRating && (info.ratingsCount ?? 0) >= RATINGS_MINIMOS
+        ? info.averageRating
+        : null,
+    cantidadRatings:
+      info.averageRating && (info.ratingsCount ?? 0) >= RATINGS_MINIMOS
+        ? (info.ratingsCount ?? null)
+        : null,
   };
 }
 

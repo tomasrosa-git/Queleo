@@ -13,6 +13,8 @@ const completo = {
       { type: "ISBN_13", identifier: "9788433966056" },
     ],
     imageLinks: { thumbnail: "http://books.google.com/tapa.jpg" },
+    averageRating: 4.5,
+    ratingsCount: 120,
   },
 };
 
@@ -26,6 +28,8 @@ describe("parsearVolumen", () => {
       portadaUrl: "https://books.google.com/tapa.jpg",
       anioPublicacion: 1998,
       paginas: 609,
+      ratingPublico: 4.5,
+      cantidadRatings: 120,
     });
   });
 
@@ -97,6 +101,30 @@ describe("parsearVolumen", () => {
       volumeInfo: { title: "Trust", subtitle: "Una novela" },
     };
     expect(parsearVolumen(conSubtitulo)?.titulo).toBe("Trust: Una novela");
+  });
+});
+
+describe("rating público", () => {
+  const conRating = (averageRating?: number, ratingsCount?: number) =>
+    parsearVolumen({
+      id: "x",
+      volumeInfo: { title: "T", averageRating, ratingsCount },
+    });
+
+  it("descarta el promedio cuando lo votaron muy pocos", () => {
+    // Caso real: Google Books devuelve promedios sacados de dos o tres votos.
+    expect(conRating(4.5, 2)?.ratingPublico).toBeNull();
+    expect(conRating(3, 1)?.ratingPublico).toBeNull();
+  });
+
+  it("lo acepta a partir del mínimo de votos", () => {
+    expect(conRating(4, 3)?.ratingPublico).toBe(4);
+    expect(conRating(4, 3)?.cantidadRatings).toBe(3);
+  });
+
+  it("queda en null cuando el volumen no trae rating, que es lo más común", () => {
+    expect(conRating(undefined, undefined)?.ratingPublico).toBeNull();
+    expect(conRating(undefined, 50)?.ratingPublico).toBeNull();
   });
 });
 

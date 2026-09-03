@@ -18,6 +18,7 @@ model User {
   perfil       PerfilLector?
   mensajes     MensajeOnboarding[]
   recomendaciones Recomendacion[]
+  analisis     AnalisisLibro[]
 }
 
 model RefreshToken {
@@ -40,9 +41,12 @@ model Libro {
   portadaUrl      String?
   anioPublicacion Int?
   paginas         Int?
+  ratingPublico   Float?
+  cantidadRatings Int?
   cacheadoEn      DateTime @default(now())
   entradas        EntradaBiblioteca[]
   recomendaciones Recomendacion[]
+  analisis        AnalisisLibro[]
 }
 
 enum EstadoLectura {
@@ -115,4 +119,20 @@ model Recomendacion {
 
   @@unique([usuarioId, libroId])
   @@index([usuarioId, orden])
+}
+
+// La predicción se guarda para no volver a pagarle a la IA cada vez que se
+// abre la misma ficha; se puede regenerar a pedido.
+model AnalisisLibro {
+  id           String   @id @default(uuid())
+  usuario      User     @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+  usuarioId    String
+  libro        Libro    @relation(fields: [libroId], references: [id], onDelete: Cascade)
+  libroId      String
+  sinopsis     String
+  prediccion   Float
+  razonamiento String
+  creadoEn     DateTime @default(now())
+
+  @@unique([usuarioId, libroId])
 }
