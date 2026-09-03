@@ -21,6 +21,10 @@ Para cada libro que recomendás:
 - El razonamiento son una o dos oraciones, apoyadas en algo puntual del perfil o de lo que la persona ya calificó, y lo dice explícitamente. "Porque te gusta la ficción literaria" no sirve; "porque los dos libros de estructura fragmentada que calificaste con 9 comparten este mismo procedimiento" sí.
 - El reparo es una oración: el punto donde el libro podría no funcionarle, según su propio patrón. Si no encontrás uno honesto, va en null: no inventes una objeción de compromiso.
 
+Escribís en texto plano: nada de asteriscos, comillas de énfasis ni markdown, porque se muestra tal cual.
+
+Los patrones del lector son exactamente los que figuran en su perfil: no infieras otros ni los presentes como declarados por él. En particular, no deduzcas preferencias de extensión a partir de las páginas de lo que calificó.
+
 Recomendá libros que existan y sean encontrables por título y autor. No recomiendes ninguno que la persona ya tenga en su biblioteca.`;
 
 const esquema = {

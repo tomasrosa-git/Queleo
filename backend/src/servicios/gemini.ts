@@ -7,11 +7,12 @@ import {
 import { AppError } from "../middleware/errorHandler.js";
 
 const API = "https://generativelanguage.googleapis.com/v1beta/interactions";
-// "gemini-flash-latest" apunta hoy a 3.7-flash, el modelo más nuevo y el más
-// congestionado en el free tier (confirmado en vivo: 500 "high demand" y
-// cuelgues sin respuesta). La propia API, al pedirle 2.5-flash, recomendó
-// 3.6-flash para cuentas nuevas — se fija ese en vez del alias "latest".
-const MODELO = process.env.GEMINI_MODELO ?? "gemini-3.6-flash";
+// Los modelos grandes del free tier están saturados casi siempre: 3.7-flash
+// (donde apunta "gemini-flash-latest") y 3.6-flash fallaron con 500 "high
+// demand" o timeouts en la mayoría de los intentos, mientras la línea lite
+// respondió todas las veces y con buena calidad. Para un proyecto que corre
+// sobre el free tier, la disponibilidad pesa más que el tamaño del modelo.
+const MODELO = process.env.GEMINI_MODELO ?? "gemini-flash-lite-latest";
 // Una respuesta corta (un turno de entrevista) vuelve en 8-15s, pero pedir
 // varias recomendaciones con su razonamiento genera mucho más texto y pasa
 // los 30s con facilidad: cada llamador fija su propio margen.
