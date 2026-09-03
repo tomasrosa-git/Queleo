@@ -2,6 +2,7 @@
 
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
+import { PanelAnalisis } from "@/components/PanelAnalisis";
 import { PanelBiblioteca } from "@/components/PanelBiblioteca";
 import { Portada } from "@/components/Portada";
 import { useRequiereSesion } from "@/components/SesionProvider";
@@ -64,6 +65,8 @@ export default function FichaLibro() {
           </p>
         </div>
       </div>
+
+      <PanelAnalisis libro={libro} />
 
       <PanelBiblioteca googleBooksId={id} entrada={entrada} onCambio={setEntrada} />
     </main>

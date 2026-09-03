@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import { Portada } from "@/components/Portada";
 import { useRequiereSesion } from "@/components/SesionProvider";
 import { apiFetch } from "@/lib/api";
-import { fichaTecnica, type Recomendacion } from "@/lib/tipos";
+import { fichaTecnica, sinMarkdown, type Recomendacion } from "@/lib/tipos";
 
 export default function Descubrir() {
   const { usuario, cargando } = useRequiereSesion();
@@ -106,11 +106,11 @@ export default function Descubrir() {
                   Por qué te lo recomendamos
                 </p>
                 <p className="m-0 max-w-[58ch] text-[15px] leading-relaxed">
-                  {recomendacion.razonamiento}
+                  {sinMarkdown(recomendacion.razonamiento)}
                 </p>
                 {recomendacion.reparo && (
                   <p className="mb-0 mt-2.5 max-w-[58ch] text-[15px] leading-relaxed text-piedra">
-                    {recomendacion.reparo}
+                    {sinMarkdown(recomendacion.reparo)}
                   </p>
                 )}
               </div>

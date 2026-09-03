@@ -14,6 +14,8 @@ export type Libro = {
   portadaUrl: string | null;
   anioPublicacion: number | null;
   paginas: number | null;
+  ratingPublico: number | null;
+  cantidadRatings: number | null;
 };
 
 export type EntradaBiblioteca = {
@@ -63,3 +65,17 @@ export type Recomendacion = {
   reparo: string | null;
   libro: Libro;
 };
+
+export type AnalisisLibro = {
+  id: string;
+  sinopsis: string;
+  prediccion: number;
+  razonamiento: string;
+};
+
+// El modelo mete énfasis de markdown aunque se le pida que no, y el texto se
+// muestra tal cual: se limpia al renderizar para que valga también para lo
+// que ya está guardado.
+export function sinMarkdown(texto: string) {
+  return texto.replace(/\*\*?([^*\n]+)\*\*?/g, "$1").replace(/_([^_\n]+)_/g, "$1");
+}
