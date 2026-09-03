@@ -118,6 +118,49 @@ describe("login", () => {
   });
 });
 
+describe("limpieza de sesiones vencidas", () => {
+  it("borra los tokens vencidos del usuario al emitir una sesión nueva", async () => {
+    mock.user.findUnique.mockResolvedValue({
+      id: "u1",
+      email: "ana@queleo.test",
+      name: "Ana",
+      passwordHash: await bcrypt.hash("unaClaveLarga", 10),
+    });
+
+    await auth.login("ana@queleo.test", "unaClaveLarga");
+
+    const filtro = mock.refreshToken.deleteMany.mock.calls[0][0].where;
+    expect(filtro.userId).toBe("u1");
+    expect(filtro.expiresAt.lt).toBeInstanceOf(Date);
+  });
+
+  it("no toca los tokens de otros usuarios", async () => {
+    mock.user.findUnique.mockResolvedValue({
+      id: "u1",
+      email: "ana@queleo.test",
+      name: "Ana",
+      passwordHash: await bcrypt.hash("unaClaveLarga", 10),
+    });
+
+    await auth.login("ana@queleo.test", "unaClaveLarga");
+
+    // Sin el userId en el filtro, entrar una persona cerraría las sesiones
+    // vencidas de todas las demás.
+    expect(mock.refreshToken.deleteMany.mock.calls[0][0].where).toHaveProperty("userId");
+  });
+
+  it("borra sólo lo vencido y nunca las sesiones vigentes", async () => {
+    mock.user.findUnique.mockResolvedValue(null);
+    mock.user.create.mockResolvedValue({ id: "u2", email: "beto@queleo.test", name: "Beto" });
+
+    await auth.register("beto@queleo.test", "unaClaveLarga", "Beto");
+
+    const { expiresAt } = mock.refreshToken.deleteMany.mock.calls[0][0].where;
+    expect(expiresAt).toEqual({ lt: expect.any(Date) });
+    expect(expiresAt.lt.getTime()).toBeLessThanOrEqual(Date.now());
+  });
+});
+
 describe("refresh", () => {
   const publico = { id: "u1", email: "ana@queleo.test", name: "Ana" };
 
