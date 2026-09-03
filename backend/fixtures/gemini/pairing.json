@@ -1,0 +1,54 @@
+{
+  "status": "completed",
+  "usage": {
+    "total_tokens": 847,
+    "total_input_tokens": 488,
+    "input_tokens_by_modality": [
+      {
+        "modality": "text",
+        "tokens": 488
+      }
+    ],
+    "total_cached_tokens": 0,
+    "total_output_tokens": 359,
+    "total_tool_use_tokens": 0,
+    "total_thought_tokens": 0,
+    "raw_prompt_token": 692,
+    "model_invocation_token_counts": [
+      {
+        "prompt_tokens_details": [
+          {
+            "modality": "text",
+            "tokens": 692
+          }
+        ],
+        "candidates_tokens_details": [
+          {
+            "modality": "text",
+            "tokens": 376
+          }
+        ]
+      }
+    ]
+  },
+  "created": "2026-09-03T18:14:57Z",
+  "updated": "2026-09-03T18:14:57Z",
+  "service_tier": "standard",
+  "steps": [
+    {
+      "signature": "El4KXAERTTIPhde8PgPh7C7ph9VYeyoP9+BLB3JH5uOsJEygeYU4aZxoK/8rELyrKmbCOhjXdK/7qrmkSgLgerdxrVcCoq97SVhYQlohjSsuKiP9Vsv/t+cKS2aMAdP9",
+      "type": "thought"
+    },
+    {
+      "content": [
+        {
+          "text": "{\n  \"lectura\": \"Buscás ficciones sobre espacios laborales y burocráticos donde la estructura de la vigilancia y el control institucional fracturan la percepción de la realidad de los personajes.\",\n  \"sugerencias\": [\n    {\n      \"titulo\": \"Las intermitencias de la muerte\",\n      \"autor\": \"José Saramago\",\n      \"vinculo\": \"Trabaja la maquinaria estatal y el funcionamiento administrativo desde una lógica absurda que descoloca al lector a través de una voz coral y distante.\"\n    },\n    {\n      \"titulo\": \"Los lanzallamas\",\n      \"autor\": \"Rachel Kushner\",\n      \"vinculo\": \"Explora cómo las estructuras industriales y las corporaciones modernas modelan la subjetividad y el aislamiento de quienes forman parte de ellas.\"\n    },\n    {\n      \"titulo\": \"Los testamentos\",\n      \"autor\": \"Margaret Atwood\",\n      \"vinculo\": \"Utiliza múltiples puntos de vista para diseccionar el funcionamiento interno de una institución totalitaria que vigila y administra la información.\"\n    },\n    {\n      \"titulo\": \"Constellation\",\n      \"autor\": \"Adrienne Celt\",\n      \"vinculo\": \"Aborda la tensión entre la labor artística y la burocracia estatal bajo regímenes de control ideológico estricto.\"\n    },\n    {\n      \"titulo\": \"La oficina\",\n      \"autor\": \"Leopoldo Brizuela\",\n      \"vinculo\": \"Construye un clima de encierro y paranoia laboral donde el espacio de trabajo se vuelve una trampa psicológica opresiva.\"\n    }\n  ]\n}",
+          "type": "text"
+        }
+      ],
+      "type": "model_output"
+    }
+  ],
+  "object": "interaction",
+  "model": "gemini-flash-lite-latest"
+}

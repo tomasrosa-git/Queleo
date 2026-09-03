@@ -1,11 +1,9 @@
 import { z } from "zod";
-import { elegirCoincidencia } from "../lib/coincidencia.js";
 import { registrarLlamado, verificarCupo } from "../lib/consumoGemini.js";
 import { prisma } from "../lib/prisma.js";
 import { AppError } from "../middleware/errorHandler.js";
 import { generar as generarConIa } from "./gemini.js";
-import * as googleBooks from "./googleBooks.js";
-import { cachearLibro } from "./libros.js";
+import { cachearLibro, resolverPropuestas } from "./libros.js";
 
 // Se piden un par más de las que se muestran porque algunas se caen al no
 // encontrarse en el catálogo. Pedir muchas más era contraproducente: con ocho,
@@ -116,22 +114,7 @@ export async function regenerar(usuarioId: string) {
   });
   await registrarLlamado();
 
-  // La IA puede proponer un libro que no existe o que el catálogo no encuentra;
-  // esas se descartan en vez de mostrarse sin tapa ni ficha.
-  // Las búsquedas van de a una: cinco en paralelo son un pico que Google Books
-  // rechaza, y al lado de los ~30s que tarda la IA no se nota la diferencia.
-  const validas = [];
-  for (const propuesta of salida.recomendaciones) {
-    if (validas.length === A_MOSTRAR) {
-      break;
-    }
-
-    const resultados = await googleBooks.buscar(`${propuesta.titulo} ${propuesta.autor}`);
-    const libro = elegirCoincidencia(propuesta, resultados);
-    if (libro) {
-      validas.push({ propuesta, libro });
-    }
-  }
+  const validas = await resolverPropuestas(salida.recomendaciones, A_MOSTRAR);
 
   if (validas.length === 0) {
     throw new AppError(502, "No pudimos encontrar los libros sugeridos en el catálogo.");

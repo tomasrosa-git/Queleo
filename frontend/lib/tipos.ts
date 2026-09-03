@@ -79,3 +79,8 @@ export type AnalisisLibro = {
 export function sinMarkdown(texto: string) {
   return texto.replace(/\*\*?([^*\n]+)\*\*?/g, "$1").replace(/_([^_\n]+)_/g, "$1");
 }
+
+export type Pairing = {
+  lectura: string;
+  sugerencias: { libro: Libro; vinculo: string }[];
+};
