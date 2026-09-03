@@ -11,6 +11,7 @@ export default function Descubrir() {
   const { usuario, cargando } = useRequiereSesion();
   const [recomendaciones, setRecomendaciones] = useState<Recomendacion[] | null>(null);
   const [generando, setGenerando] = useState(false);
+  const [descartando, setDescartando] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -25,6 +26,19 @@ export default function Descubrir() {
       vigente = false;
     };
   }, [usuario]);
+
+  async function descartar(id: string) {
+    setDescartando(id);
+
+    try {
+      await apiFetch(`/recomendaciones/${id}`, { method: "DELETE" });
+      setRecomendaciones((previas) => previas?.filter((r) => r.id !== id) ?? null);
+    } catch (e) {
+      setError((e as Error).message);
+    } finally {
+      setDescartando(null);
+    }
+  }
 
   async function generar() {
     setGenerando(true);
@@ -113,6 +127,15 @@ export default function Descubrir() {
                     {sinMarkdown(recomendacion.reparo)}
                   </p>
                 )}
+
+                <button
+                  type="button"
+                  onClick={() => descartar(recomendacion.id)}
+                  disabled={descartando === recomendacion.id}
+                  className="mt-4 cursor-pointer border-none bg-transparent p-0 text-[13px] text-piedra underline hover:text-guinda disabled:opacity-50"
+                >
+                  {descartando === recomendacion.id ? "Descartando…" : "No me interesa"}
+                </button>
               </div>
             </li>
           ))}

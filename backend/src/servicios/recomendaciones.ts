@@ -56,15 +56,26 @@ const propuestas = z.object({
   ),
 });
 
+export async function descartar(usuarioId: string, recomendacionId: string) {
+  const { count } = await prisma.recomendacion.updateMany({
+    where: { id: recomendacionId, usuarioId, descartadaEn: null },
+    data: { descartadaEn: new Date() },
+  });
+
+  if (count === 0) {
+    throw new AppError(404, "Esa recomendación ya no está.");
+  }
+}
+
 export function listar(usuarioId: string) {
   return prisma.recomendacion.findMany({
-    where: { usuarioId },
+    where: { usuarioId, descartadaEn: null },
     include: { libro: true },
     orderBy: { orden: "asc" },
   });
 }
 
-async function contexto(usuarioId: string) {
+async function contexto(usuarioId: string, descartados: string[] = []) {
   const perfil = await prisma.perfilLector.findUnique({ where: { usuarioId } });
   if (!perfil) {
     throw new AppError(409, "Primero armá tu perfil lector en la sección Perfil.");
@@ -76,6 +87,8 @@ async function contexto(usuarioId: string) {
     orderBy: [{ rating: "desc" }, { actualizadaEn: "desc" }],
     take: 25,
   });
+
+  const yaSugeridos = descartados.map((t) => `- ${t}`).join("\n");
 
   const biblioteca = entradas
     .map((entrada) => {
@@ -95,16 +108,24 @@ Patrones: ${perfil.patrones.join(" · ") || "sin datos"}
 
 Ya tiene en su biblioteca (no los recomiendes de nuevo):
 ${biblioteca || "(biblioteca vacía)"}
-
+${yaSugeridos ? `\nYa se le sugirieron y no le interesaron, no insistas:\n${yaSugeridos}` : ""}
 Recomendá ${A_PEDIR} libros.`;
 }
 
 export async function regenerar(usuarioId: string) {
   await verificarCupo();
 
+  // Todo lo ya propuesto cuenta como visto, tanto lo que sigue en pantalla
+  // como lo que la persona descartó.
+  const yaPropuestas = await prisma.recomendacion.findMany({
+    where: { usuarioId },
+    include: { libro: true },
+  });
+  const vistos = yaPropuestas.map((r) => `${r.libro.titulo} (${r.libro.autores.join(", ")})`);
+
   const salida = await generarConIa({
     sistema: SISTEMA,
-    turnos: [{ rol: "user", texto: await contexto(usuarioId) }],
+    turnos: [{ rol: "user", texto: await contexto(usuarioId, vistos) }],
     esquema,
     schema: propuestas,
     // Ocho recomendaciones con su razonamiento son bastante más texto que un
@@ -123,7 +144,7 @@ export async function regenerar(usuarioId: string) {
   const libros = await Promise.all(validas.map(({ libro }) => cachearLibro(libro)));
 
   await prisma.$transaction([
-    prisma.recomendacion.deleteMany({ where: { usuarioId } }),
+    prisma.recomendacion.deleteMany({ where: { usuarioId, descartadaEn: null } }),
     prisma.recomendacion.createMany({
       data: validas.map(({ propuesta }, i) => ({
         usuarioId,

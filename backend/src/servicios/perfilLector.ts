@@ -1,12 +1,18 @@
 import { z } from "zod";
 import { registrarLlamado, verificarCupo } from "../lib/consumoGemini.js";
 import { prisma } from "../lib/prisma.js";
+import { AppError } from "../middleware/errorHandler.js";
 import { generar, type TurnoGemini } from "./gemini.js";
 
 // El contexto que viaja a la IA se acota a propósito: los libros mejor
 // calificados alcanzan para derivar el gusto y evitan prompts gigantes.
 const LIBROS_EN_CONTEXTO = 20;
 const TURNOS_EN_CONTEXTO = 40;
+
+// Con dos o tres libros, cualquier patrón que se derive es ruido: se vio a la
+// IA inferir "leés novelas de 300 a 400 páginas" a partir de dos.
+export const MINIMO_PARA_PERFIL = 5;
+const AUTORES_EN_PERFIL = 6;
 
 export const SALUDO_INICIAL =
   "Contame qué estuviste leyendo últimamente, o qué libro te dejó pensando " +
@@ -30,9 +36,11 @@ const SISTEMA_PERFIL = `Sos el analista de Queleo. A partir de una conversación
 
 ${TONO}
 
-El resumen son dos o tres oraciones que describen el gusto del lector con precisión, mencionando tensiones o contradicciones si las hay. Los géneros y autores salen de lo que el lector mostró, no de lo que se supone que debería gustarle. Los patrones son observaciones concretas y accionables sobre su forma de leer, del tipo "puntúa más alto los libros de menos de 300 páginas" o "abandona las sagas largas".
+El resumen son dos o tres oraciones que describen el gusto del lector con precisión, mencionando tensiones o contradicciones si las hay. Los géneros y autores salen de lo que el lector mostró, no de lo que se supone que debería gustarle. Los patrones son observaciones concretas y accionables sobre su forma de leer, del tipo "puntúa más alto los libros donde la voz narrativa es poco confiable" o "abandona las sagas largas". Cada patrón tiene que apoyarse en libros puntuales de su biblioteca, y los nombrás entre paréntesis.
 
-No inventes datos que la conversación no respalde.`;
+En autores va una selección de hasta ${AUTORES_EN_PERFIL}: los que mejor representan su gusto, no todos los que leyó.
+
+No inventes datos que la conversación no respalde, y no deduzcas patrones que la cantidad de libros no alcance a sostener: con pocos libros calificados, describí lo que ves sin generalizar. En particular no infieras preferencias de extensión a partir de la cantidad de páginas de lo que calificó.`;
 
 const respuestaOnboarding = z.object({
   respuesta: z.string().min(1),
@@ -135,6 +143,17 @@ export async function responder(usuarioId: string, mensaje: string) {
 }
 
 export async function derivar(usuarioId: string) {
+  const calificados = await prisma.entradaBiblioteca.count({
+    where: { usuarioId, rating: { not: null } },
+  });
+
+  if (calificados < MINIMO_PARA_PERFIL) {
+    throw new AppError(
+      409,
+      `Calificá al menos ${MINIMO_PARA_PERFIL} libros para armar tu perfil: con menos, lo que salga van a ser generalidades. Llevás ${calificados}.`,
+    );
+  }
+
   await verificarCupo();
 
   const previos = await historial(usuarioId);

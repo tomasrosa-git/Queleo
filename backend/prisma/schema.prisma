@@ -116,6 +116,9 @@ model Recomendacion {
   reparo       String?
   orden        Int
   creadaEn     DateTime @default(now())
+  // Se marca en vez de borrarse: si desapareciera, la próxima tanda no
+  // sabría que ese libro ya se propuso y podría volver a sugerirlo.
+  descartadaEn DateTime?
 
   @@unique([usuarioId, libroId])
   @@index([usuarioId, orden])
