@@ -100,3 +100,20 @@ export type ResultadoImportacion = {
   noEncontrados: string[];
   fallaron: string[];
 };
+
+export type Estadisticas = {
+  leidos: number;
+  leyendo: number;
+  porLeer: number;
+  calificados: number;
+  promedio: number | null;
+  paginas: number;
+  autores: { nombre: string; libros: number }[];
+  distribucion: { puntaje: number; libros: number }[];
+  decadas: { decada: number; libros: number }[];
+};
+
+export type ResumenBiblioteca = {
+  estadisticas: Estadisticas;
+  estante: EntradaBiblioteca[];
+};

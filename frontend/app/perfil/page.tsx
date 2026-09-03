@@ -2,13 +2,21 @@
 
 import { useEffect, useState } from "react";
 import { Colofon } from "@/components/Colofon";
+import { Estante } from "@/components/Estante";
+import { Numeros } from "@/components/Numeros";
 import { useRequiereSesion } from "@/components/SesionProvider";
 import { apiFetch } from "@/lib/api";
-import type { EstadoPerfil, MensajeOnboarding, PerfilLector } from "@/lib/tipos";
+import type {
+  EstadoPerfil,
+  MensajeOnboarding,
+  PerfilLector,
+  ResumenBiblioteca,
+} from "@/lib/tipos";
 
 export default function Perfil() {
   const { usuario, cargando } = useRequiereSesion();
   const [estado, setEstado] = useState<EstadoPerfil | null>(null);
+  const [resumen, setResumen] = useState<ResumenBiblioteca | null>(null);
   const [borrador, setBorrador] = useState("");
   const [enviando, setEnviando] = useState(false);
   const [derivando, setDerivando] = useState(false);
@@ -22,6 +30,12 @@ export default function Perfil() {
     apiFetch<EstadoPerfil>("/perfil")
       .then((datos) => vigente && setEstado(datos))
       .catch((e) => vigente && setError((e as Error).message));
+
+    // Los números salen de la biblioteca, no del perfil: se piden aparte para
+    // que la página no dependa de que exista un perfil derivado.
+    apiFetch<ResumenBiblioteca>("/biblioteca/estadisticas")
+      .then((datos) => vigente && setResumen(datos))
+      .catch(() => {});
 
     return () => {
       vigente = false;
@@ -110,6 +124,13 @@ export default function Perfil() {
       <h1 className="mb-8 text-[32px] font-bold leading-tight tracking-tight">
         {usuario.name}
       </h1>
+
+      {resumen && resumen.estadisticas.leidos > 0 && (
+        <>
+          <Estante entradas={resumen.estante} />
+          <Numeros datos={resumen.estadisticas} />
+        </>
+      )}
 
       {perfil && (
         <Colofon
