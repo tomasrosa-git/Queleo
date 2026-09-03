@@ -14,6 +14,13 @@ async function emitirSesion(userId: string) {
   const { token, tokenHash } = generateRefreshToken();
   const expiresAt = new Date(Date.now() + REFRESH_DAYS * 24 * 60 * 60 * 1000);
 
+  // Los tokens vencidos ya no sirven para nada y sólo hacen crecer la tabla.
+  // Se limpian acá, aprovechando que el usuario está entrando, en vez de
+  // montar una tarea programada para algo que puede resolverse solo.
+  await prisma.refreshToken.deleteMany({
+    where: { userId, expiresAt: { lt: new Date() } },
+  });
+
   await prisma.refreshToken.create({ data: { tokenHash, userId, expiresAt } });
 
   return { accessToken: signAccessToken(userId), refreshToken: token };
