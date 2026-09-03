@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { ImportarBiblioteca } from "@/components/ImportarBiblioteca";
 import { Portada } from "@/components/Portada";
 import { useRequiereSesion } from "@/components/SesionProvider";
 import { apiFetch } from "@/lib/api";
@@ -22,6 +23,7 @@ export default function Biblioteca() {
   const { usuario, cargando } = useRequiereSesion();
   const [filtro, setFiltro] = useState<EstadoLectura | null>(null);
   const [entradas, setEntradas] = useState<EntradaBiblioteca[] | null>(null);
+  const [recargar, setRecargar] = useState(0);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -37,7 +39,7 @@ export default function Biblioteca() {
     return () => {
       vigente = false;
     };
-  }, [filtro, usuario]);
+  }, [filtro, usuario, recargar]);
 
   if (cargando || !usuario) {
     return null;
@@ -75,7 +77,7 @@ export default function Biblioteca() {
             No tenés libros en «{ETIQUETAS_ESTADO[filtro]}».
           </p>
         ) : (
-          <p className="text-[15px] leading-relaxed text-piedra">
+          <p className="mb-6 text-[15px] leading-relaxed text-piedra">
             Todavía no hay nada acá.{" "}
             <Link href="/buscar" className="text-guinda">
               Buscá un libro
@@ -117,6 +119,9 @@ export default function Biblioteca() {
           ))}
         </ul>
       )}
+      <div className="mt-10">
+        <ImportarBiblioteca alTerminar={() => setRecargar((n) => n + 1)} />
+      </div>
     </main>
   );
 }
