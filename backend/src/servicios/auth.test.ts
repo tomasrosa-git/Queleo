@@ -118,6 +118,43 @@ describe("login", () => {
   });
 });
 
+describe("cuentas creadas con Google", () => {
+  it("no intenta comparar contra una contraseña que no existe", async () => {
+    // Sin este corte, bcrypt.compare recibe null y el endpoint devuelve 500.
+    mock.user.findUnique.mockResolvedValue({
+      id: "u1",
+      email: "ana@queleo.test",
+      name: "Ana",
+      passwordHash: null,
+      googleId: "g-123",
+    });
+
+    const error = await auth.login("ana@queleo.test", "loQueSea").catch((e) => e);
+
+    expect(error).toBeInstanceOf(AppError);
+    expect(error.status).toBe(409);
+    expect(error.message).toContain("Google");
+  });
+
+  it("sigue sin distinguir email inexistente de contraseña incorrecta", async () => {
+    // El caso de Google es la única excepción deliberada; el resto tiene que
+    // seguir respondiendo igual.
+    mock.user.findUnique.mockResolvedValue(null);
+    const inexistente = await auth.login("nadie@queleo.test", "unaClaveLarga").catch((e) => e);
+
+    mock.user.findUnique.mockResolvedValue({
+      id: "u1",
+      email: "ana@queleo.test",
+      name: "Ana",
+      passwordHash: await bcrypt.hash("otraCosa", 10),
+    });
+    const claveMal = await auth.login("ana@queleo.test", "unaClaveLarga").catch((e) => e);
+
+    expect(inexistente.message).toBe(claveMal.message);
+    expect(inexistente.status).toBe(claveMal.status);
+  });
+});
+
 describe("limpieza de sesiones vencidas", () => {
   it("borra los tokens vencidos del usuario al emitir una sesión nueva", async () => {
     mock.user.findUnique.mockResolvedValue({

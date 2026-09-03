@@ -36,6 +36,10 @@ const registerSchema = z.object({
   name: z.string().trim().min(1, "Falta el nombre"),
 });
 
+const googleSchema = z.object({
+  credential: z.string().min(1, "Falta el token de Google"),
+});
+
 const loginSchema = z.object({
   email: z.email("Email inválido"),
   password: z.string().min(1, "Falta la contraseña"),
@@ -56,6 +60,14 @@ authRouter.post("/auth/register", limitePorIp, async (req, res) => {
 authRouter.post("/auth/login", limitePorIp, async (req, res) => {
   const { email, password } = parsear(loginSchema, req.body);
   const { user, accessToken, refreshToken } = await auth.login(email, password);
+
+  res.cookie(COOKIE, refreshToken, opcionesCookie);
+  res.json({ user, accessToken });
+});
+
+authRouter.post("/auth/google", limitePorIp, async (req, res) => {
+  const { credential } = parsear(googleSchema, req.body);
+  const { user, accessToken, refreshToken } = await auth.loginConGoogle(credential);
 
   res.cookie(COOKIE, refreshToken, opcionesCookie);
   res.json({ user, accessToken });

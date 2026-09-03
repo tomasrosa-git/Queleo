@@ -9,7 +9,10 @@ datasource db {
 model User {
   id           String         @id @default(uuid())
   email        String         @unique
-  passwordHash String
+  // Queda vacío en las cuentas creadas con Google: esas personas no eligieron
+  // contraseña y no pueden entrar por el formulario.
+  passwordHash String?
+  googleId     String?        @unique
   name         String
   createdAt    DateTime       @default(now())
   updatedAt    DateTime       @updatedAt

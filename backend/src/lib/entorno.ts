@@ -35,4 +35,8 @@ export function validarEntorno() {
   if (!process.env.GEMINI_API_KEY) {
     console.warn("Sin GEMINI_API_KEY: las funciones con IA van a responder 503.");
   }
+
+  if (!process.env.GOOGLE_CLIENT_ID) {
+    console.warn("Sin GOOGLE_CLIENT_ID: el ingreso con Google va a responder 503.");
+  }
 }

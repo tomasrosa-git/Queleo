@@ -12,6 +12,7 @@ type Sesion = {
   usuario: Usuario | null;
   cargando: boolean;
   ingresar: (email: string, password: string) => Promise<void>;
+  ingresarConGoogle: (credential: string) => Promise<void>;
   registrarse: (email: string, password: string, name: string) => Promise<void>;
   salir: () => Promise<void>;
 };
@@ -51,6 +52,14 @@ export function SesionProvider({ children }: { children: React.ReactNode }) {
         await apiFetch<Respuesta>("/auth/login", {
           method: "POST",
           body: JSON.stringify({ email, password }),
+        }),
+      );
+    },
+    async ingresarConGoogle(credential) {
+      aplicar(
+        await apiFetch<Respuesta>("/auth/google", {
+          method: "POST",
+          body: JSON.stringify({ credential }),
         }),
       );
     },
