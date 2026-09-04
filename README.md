@@ -2,6 +2,8 @@
 
 **[queleo.vercel.app](https://queleo.vercel.app)**
 
+[![CI](https://github.com/tomasrosa-git/Queleo/actions/workflows/ci.yml/badge.svg)](https://github.com/tomasrosa-git/Queleo/actions/workflows/ci.yml)
+
 Plataforma web sobre libros con un perfil lector construido junto a una IA como
 eje central. En vez del promedio público de ratings, Queleo arma un perfil a
 partir de lo que leíste y cómo lo calificaste, y sobre eso da recomendaciones,
