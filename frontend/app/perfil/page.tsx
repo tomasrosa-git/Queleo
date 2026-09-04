@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { Aciertos } from "@/components/Aciertos";
 import { Colofon } from "@/components/Colofon";
 import { Estante } from "@/components/Estante";
 import { Numeros } from "@/components/Numeros";
@@ -129,6 +130,7 @@ export default function Perfil() {
         <>
           <Estante entradas={resumen.estante} />
           <Numeros datos={resumen.estadisticas} />
+          {resumen.precision && <Aciertos datos={resumen.precision} />}
         </>
       )}
 

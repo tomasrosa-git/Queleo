@@ -31,12 +31,13 @@ bibliotecaRouter.get("/biblioteca", requireAuth, async (req, res) => {
 });
 
 bibliotecaRouter.get("/biblioteca/estadisticas", requireAuth, async (req, res) => {
-  const [resumen, estante] = await Promise.all([
+  const [resumen, estante, precision] = await Promise.all([
     biblioteca.estadisticas(req.userId!),
     biblioteca.destacados(req.userId!, 6),
+    biblioteca.precision(req.userId!),
   ]);
 
-  res.json({ estadisticas: resumen, estante });
+  res.json({ estadisticas: resumen, estante, precision });
 });
 
 bibliotecaRouter.get("/biblioteca/:googleBooksId", requireAuth, async (req, res) => {
