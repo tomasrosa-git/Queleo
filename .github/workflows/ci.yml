@@ -35,6 +35,11 @@ jobs:
     defaults:
       run:
         working-directory: frontend
+    # next.config.ts corta el arranque si falta, porque la URL se incrusta en
+    # el bundle. La necesitan tanto typegen como build; acá sólo se verifica
+    # que compile.
+    env:
+      NEXT_PUBLIC_API_URL: https://queleo-api.onrender.com
     steps:
       - uses: actions/checkout@v4
 
@@ -48,11 +53,9 @@ jobs:
           cache-dependency-path: frontend/pnpm-lock.yaml
 
       - run: pnpm install --frozen-lockfile
-      - run: pnpm exec tsc --noEmit
+      # typecheck genera antes los tipos de rutas: LayoutProps y PageProps son
+      # globales que Next escribe dentro de .next/, que no se versiona, así que
+      # un tsc pelado no los encuentra en un checkout limpio.
+      - run: pnpm run typecheck
       - run: pnpm exec eslint .
-
-      # El build falla a propósito si falta esta variable, porque se incrusta
-      # en el bundle. Acá sólo se verifica que compile.
       - run: pnpm run build
-        env:
-          NEXT_PUBLIC_API_URL: https://queleo-api.onrender.com
