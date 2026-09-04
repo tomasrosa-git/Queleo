@@ -113,7 +113,15 @@ export type Estadisticas = {
   decadas: { decada: number; libros: number }[];
 };
 
+export type Precision = {
+  comparaciones: number;
+  margen: number;
+  cerca: number;
+  sesgo: number;
+};
+
 export type ResumenBiblioteca = {
   estadisticas: Estadisticas;
   estante: EntradaBiblioteca[];
+  precision: Precision | null;
 };

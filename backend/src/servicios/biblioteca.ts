@@ -1,5 +1,6 @@
 import type { EstadoLectura } from "@prisma/client";
 import { calcularEstadisticas } from "../lib/estadisticas.js";
+import { calcularPrecision } from "../lib/precision.js";
 import { prisma } from "../lib/prisma.js";
 import { AppError } from "../middleware/errorHandler.js";
 import { asegurarLibro } from "./libros.js";
@@ -71,4 +72,33 @@ export function destacados(usuarioId: string, cuantos: number) {
     orderBy: [{ rating: "desc" }, { actualizadaEn: "desc" }],
     take: cuantos,
   });
+}
+
+// Sólo cuentan los libros que la persona analizó ANTES de calificarlos: si el
+// análisis se pidió después, el modelo ya vio el puntaje en el contexto y
+// "acertar" no significaría nada.
+export async function precision(usuarioId: string) {
+  const [analisis, entradas] = await Promise.all([
+    prisma.analisisLibro.findMany({
+      where: { usuarioId },
+      select: { libroId: true, prediccion: true, creadoEn: true },
+    }),
+    prisma.entradaBiblioteca.findMany({
+      where: { usuarioId, rating: { not: null } },
+      select: { libroId: true, rating: true, actualizadaEn: true },
+    }),
+  ]);
+
+  const puntajes = new Map(entradas.map((e) => [e.libroId, e]));
+  const pares = analisis
+    .map((a) => {
+      const entrada = puntajes.get(a.libroId);
+      if (!entrada?.rating || entrada.actualizadaEn <= a.creadoEn) {
+        return null;
+      }
+      return { prediccion: a.prediccion, real: entrada.rating };
+    })
+    .filter((par): par is { prediccion: number; real: number } => par !== null);
+
+  return calcularPrecision(pares);
 }
