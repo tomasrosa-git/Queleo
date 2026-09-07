@@ -54,7 +54,7 @@ export default function FichaLibro() {
         <Portada libro={libro} tamano="h-[210px] w-[140px] sm:h-[252px] sm:w-[168px]" />
 
         <div className="min-w-0 flex-1">
-          <h1 className="mb-2 text-[32px] font-bold leading-tight tracking-tight">
+          <h1 className="mb-2 font-serif text-[34px] font-bold leading-tight tracking-tight">
             {libro.titulo}
           </h1>
           <p className="mb-[18px] text-[15px] text-piedra">

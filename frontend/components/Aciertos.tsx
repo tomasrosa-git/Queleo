@@ -12,7 +12,7 @@ function comoLeerElSesgo(sesgo: number) {
 
 export function Aciertos({ datos }: { datos: Precision }) {
   return (
-    <section className="mb-12 border-y border-linea py-[22px]">
+    <section className="mb-12 border-t border-linea pb-2 pt-[22px]">
       <p className="mb-2.5 text-[11px] uppercase tracking-[0.1em] text-piedra">
         Qué tan bien te conoce
       </p>

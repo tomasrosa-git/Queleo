@@ -3,7 +3,9 @@ import type { Estadisticas } from "@/lib/tipos";
 function Dato({ valor, etiqueta }: { valor: string; etiqueta: string }) {
   return (
     <div>
-      <div className="text-[26px] font-bold leading-none tabular-nums">{valor}</div>
+      <div className="font-serif text-[28px] font-bold leading-none tabular-nums">
+        {valor}
+      </div>
       <div className="mt-1.5 text-[11px] uppercase tracking-[0.08em] text-piedra">
         {etiqueta}
       </div>
@@ -15,7 +17,7 @@ export function Numeros({ datos }: { datos: Estadisticas }) {
   const maximo = Math.max(...datos.distribucion.map((d) => d.libros), 1);
 
   return (
-    <section className="mb-12 border-y border-linea py-[22px]">
+    <section className="mb-12 border-t border-linea pb-2 pt-[22px]">
       <p className="mb-5 text-[11px] uppercase tracking-[0.1em] text-piedra">
         Tus números
       </p>

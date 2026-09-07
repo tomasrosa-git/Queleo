@@ -8,7 +8,7 @@ type Props = {
 // rol que la nota de edición al final de un libro.
 export function Colofon({ titulo, children, fuente }: Props) {
   return (
-    <section className="mb-12 border-y border-linea py-[22px]">
+    <section className="mb-12 border-t border-linea pb-2 pt-[22px]">
       <p className="mb-2.5 text-[11px] uppercase tracking-[0.1em] text-piedra">
         {titulo}
       </p>

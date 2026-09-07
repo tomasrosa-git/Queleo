@@ -68,7 +68,7 @@ export default function Descubrir() {
       <p className="mb-2.5 mt-1 text-[11px] uppercase tracking-[0.1em] text-piedra">
         Descubrir
       </p>
-      <h1 className="mb-8 text-[32px] font-bold leading-tight tracking-tight">
+      <h1 className="mb-8 font-serif text-[34px] font-bold leading-tight tracking-tight">
         Para vos
       </h1>
 
@@ -102,7 +102,7 @@ export default function Descubrir() {
                     href={`/libro/${recomendacion.libro.googleBooksId}`}
                     className="no-underline"
                   >
-                    <p className="m-0 text-[20px] font-bold leading-tight tracking-tight">
+                    <p className="m-0 font-serif text-[21px] font-bold leading-tight tracking-tight">
                       {recomendacion.libro.titulo}
                     </p>
                   </Link>
@@ -115,15 +115,19 @@ export default function Descubrir() {
                 </div>
               </div>
 
-              <div className="border-t border-linea pt-4">
+              {/* Sin línea propia: con una acá, el razonamiento quedaba tan
+                  separado de su libro como del libro siguiente. */}
+              <div>
                 <p className="mb-2 text-[11px] uppercase tracking-[0.1em] text-piedra">
                   Por qué te lo recomendamos
                 </p>
-                <p className="m-0 max-w-[58ch] text-[15px] leading-relaxed">
+                <p className="m-0 max-w-[56ch] font-serif text-[16px] leading-relaxed">
                   {sinMarkdown(recomendacion.razonamiento)}
                 </p>
+                {/* El reparo es la contra, no una segunda razón: se separa con
+                    un filete para que no se lea como continuación. */}
                 {recomendacion.reparo && (
-                  <p className="mb-0 mt-2.5 max-w-[58ch] text-[15px] leading-relaxed text-piedra">
+                  <p className="mb-0 mt-3 max-w-[56ch] border-l-2 border-linea pl-3.5 font-serif text-[15px] leading-relaxed text-piedra">
                     {sinMarkdown(recomendacion.reparo)}
                   </p>
                 )}

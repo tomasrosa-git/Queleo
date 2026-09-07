@@ -2,8 +2,8 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { GrillaLibros } from "@/components/GrillaLibros";
 import { ImportarBiblioteca } from "@/components/ImportarBiblioteca";
-import { Portada } from "@/components/Portada";
 import { useRequiereSesion } from "@/components/SesionProvider";
 import { apiFetch } from "@/lib/api";
 import {
@@ -17,6 +17,14 @@ const FILTROS: { valor: EstadoLectura | null; etiqueta: string }[] = [
   { valor: "LEYENDO", etiqueta: "Leyendo" },
   { valor: "LEIDO", etiqueta: "Leídos" },
   { valor: "QUIERO_LEER", etiqueta: "Quiero leer" },
+];
+
+// El orden cuenta una historia: lo que está leyendo ahora, lo que se propuso
+// leer, y recién después el archivo de lo terminado.
+const SECCIONES: { estado: EstadoLectura; titulo: string }[] = [
+  { estado: "LEYENDO", titulo: "Leyendo" },
+  { estado: "QUIERO_LEER", titulo: "Quiero leer" },
+  { estado: "LEIDO", titulo: "Leídos" },
 ];
 
 type Orden = "reciente" | "puntaje" | "titulo" | "autor" | "anio";
@@ -65,6 +73,14 @@ function filtrarPorTexto(entradas: EntradaBiblioteca[], texto: string) {
   );
 }
 
+function comoItems(entradas: EntradaBiblioteca[]) {
+  return entradas.map((entrada) => ({
+    clave: entrada.id,
+    libro: entrada.libro,
+    marca: entrada.rating ? String(entrada.rating) : null,
+  }));
+}
+
 export default function Biblioteca() {
   const { usuario, cargando } = useRequiereSesion();
   const [filtro, setFiltro] = useState<EstadoLectura | null>(null);
@@ -100,8 +116,13 @@ export default function Biblioteca() {
       <p className="mb-2.5 mt-1 text-[11px] uppercase tracking-[0.1em] text-piedra">
         Biblioteca
       </p>
-      <h1 className="mb-8 text-[32px] font-bold leading-tight tracking-tight">
+      <h1 className="mb-8 font-serif text-[34px] font-bold leading-tight tracking-tight">
         Tus libros
+        {entradas && entradas.length > 0 && (
+          <span className="ml-3 align-middle font-sans text-[15px] font-normal tabular-nums text-piedra">
+            {entradas.length}
+          </span>
+        )}
       </h1>
 
       <div className="mb-4 flex flex-wrap gap-x-5 gap-y-2 text-[13px] sm:gap-x-6">
@@ -167,39 +188,30 @@ export default function Biblioteca() {
         </p>
       )}
 
-      {visibles && visibles.length > 0 && (
-        <ul className="m-0 list-none p-0">
-          {visibles.map((entrada) => (
-            <li key={entrada.id} className="border-b border-linea first:border-t">
-              <Link
-                href={`/libro/${entrada.libro.googleBooksId}`}
-                className="flex gap-5 py-5 no-underline"
-              >
-                <Portada libro={entrada.libro} tamano="h-[84px] w-14" />
+      {/* Con un estado elegido la grilla va sola; en "Todo" se agrupa, porque
+          si no el estado de cada libro se pierde al sacar el rótulo por fila. */}
+      {visibles && visibles.length > 0 && filtro && <GrillaLibros items={comoItems(visibles)} />}
 
-                <div className="min-w-0 flex-1">
-                  <p className="m-0 text-[17px] font-medium leading-snug">
-                    {entrada.libro.titulo}
-                  </p>
-                  <p className="mb-1.5 mt-1 text-[13px] text-piedra">
-                    {entrada.libro.autores.join(", ") || "Autor desconocido"}
-                  </p>
-                  <p className="m-0 text-[11px] uppercase tracking-[0.08em] text-piedra">
-                    {ETIQUETAS_ESTADO[entrada.estado]}
-                  </p>
-                </div>
+      {visibles &&
+        visibles.length > 0 &&
+        !filtro &&
+        SECCIONES.map(({ estado, titulo }) => {
+          const delEstado = visibles.filter((entrada) => entrada.estado === estado);
+          if (delEstado.length === 0) {
+            return null;
+          }
 
-                {entrada.rating && (
-                  <p className="m-0 shrink-0 text-[18px] font-bold tabular-nums text-guinda">
-                    {entrada.rating}
-                    <span className="text-[13px] font-normal text-piedra">/10</span>
-                  </p>
-                )}
-              </Link>
-            </li>
-          ))}
-        </ul>
-      )}
+          return (
+            <section key={estado} className="mb-11">
+              <h2 className="mb-5 border-b border-linea pb-2 text-[11px] uppercase tracking-[0.1em] text-piedra">
+                {titulo}
+                <span className="ml-2 tabular-nums">{delEstado.length}</span>
+              </h2>
+              <GrillaLibros items={comoItems(delEstado)} />
+            </section>
+          );
+        })}
+
       <div className="mt-10">
         <ImportarBiblioteca alTerminar={() => setRecargar((n) => n + 1)} />
       </div>
