@@ -33,7 +33,7 @@ export default function Registro() {
 
   return (
     <main className="max-w-[380px]">
-      <h1 className="mb-8 text-[27px] font-bold tracking-tight">Crear cuenta</h1>
+      <h1 className="mb-8 font-serif text-[29px] font-bold tracking-tight">Crear cuenta</h1>
 
       <BotonGoogle alFallar={setError} />
 

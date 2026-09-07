@@ -1,12 +1,11 @@
 "use client";
 
-import Link from "next/link";
 import { useState } from "react";
+import { GrillaLibros } from "@/components/GrillaLibros";
 import { Pairing } from "@/components/Pairing";
-import { Portada } from "@/components/Portada";
 import { useRequiereSesion } from "@/components/SesionProvider";
 import { apiFetch } from "@/lib/api";
-import { fichaTecnica, type Libro } from "@/lib/tipos";
+import type { Libro } from "@/lib/tipos";
 
 export default function Buscar() {
   const { usuario, cargando } = useRequiereSesion();
@@ -44,7 +43,7 @@ export default function Buscar() {
       <p className="mb-2.5 mt-1 text-[11px] uppercase tracking-[0.1em] text-piedra">
         Descubrir
       </p>
-      <h1 className="mb-8 text-[32px] font-bold leading-tight tracking-tight">
+      <h1 className="mb-8 font-serif text-[34px] font-bold leading-tight tracking-tight">
         Buscar un libro
       </h1>
 
@@ -77,30 +76,12 @@ export default function Buscar() {
       {!resultados && !buscando && !error && <Pairing />}
 
       {resultados && resultados.length > 0 && (
-        <ul className="m-0 list-none p-0">
-          {resultados.map((libro) => (
-            <li key={libro.googleBooksId} className="border-b border-linea first:border-t">
-              <Link
-                href={`/libro/${libro.googleBooksId}`}
-                className="flex gap-5 py-5 no-underline"
-              >
-                <Portada libro={libro} tamano="h-[84px] w-14" />
-
-                <div className="min-w-0">
-                  <p className="m-0 text-[17px] font-medium leading-snug">
-                    {libro.titulo}
-                  </p>
-                  <p className="mb-1.5 mt-1 text-[13px] text-piedra">
-                    {libro.autores.join(", ") || "Autor desconocido"}
-                  </p>
-                  <p className="m-0 text-[11px] tabular-nums tracking-[0.03em] text-piedra">
-                    {fichaTecnica(libro)}
-                  </p>
-                </div>
-              </Link>
-            </li>
-          ))}
-        </ul>
+        <GrillaLibros
+          items={resultados.map((libro) => ({
+            clave: libro.googleBooksId,
+            libro,
+          }))}
+        />
       )}
     </main>
   );

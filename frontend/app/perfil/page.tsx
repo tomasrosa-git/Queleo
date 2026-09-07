@@ -122,7 +122,7 @@ export default function Perfil() {
       <p className="mb-2.5 mt-1 text-[11px] uppercase tracking-[0.1em] text-piedra">
         Perfil
       </p>
-      <h1 className="mb-8 text-[32px] font-bold leading-tight tracking-tight">
+      <h1 className="mb-8 font-serif text-[34px] font-bold leading-tight tracking-tight">
         {usuario.name}
       </h1>
 
@@ -139,7 +139,7 @@ export default function Perfil() {
           titulo="Tu perfil lector"
           fuente={`Actualizado el ${new Date(perfil.actualizadoEn).toLocaleDateString("es-AR")}`}
         >
-          <p className="mb-4 max-w-[58ch] text-[15px] leading-relaxed">
+          <p className="mb-4 max-w-[56ch] font-serif text-[16px] leading-relaxed">
             {perfil.resumen}
           </p>
 

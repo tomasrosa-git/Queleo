@@ -7,10 +7,22 @@
   --color-guinda: #7a2e32;
   --color-guinda-hover: #6a2529;
   --color-verde: #34473b;
-  --color-piedra: #86807a;
+  /* Es el color de casi todo el texto secundario. En #86807a daba 3.55:1
+     sobre el papel, por debajo del 4.5:1 que pide WCAG AA; así da 4.87:1. */
+  --color-piedra: #6f6a64;
   --color-linea: #d9d5cb;
 
+  --color-papel-hondo: #edeae2;
+
   --font-sans: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  /* La serif carga los títulos y todo lo que se lee de corrido — sinopsis,
+     razonamientos de la IA. La sans queda para la interfaz: rótulos, botones,
+     ficha técnica. El contraste entre las dos es lo que da el aire de libro. */
+  --font-serif: var(--font-serif-next), Georgia, "Times New Roman", serif;
+
+  /* Una tapa es un objeto físico: proyecta sombra y se levanta al tocarla. */
+  --shadow-tapa: 0 1px 2px rgba(32, 30, 27, 0.08), 0 8px 20px rgba(32, 30, 27, 0.12);
+  --shadow-tapa-alta: 0 2px 4px rgba(32, 30, 27, 0.1), 0 14px 32px rgba(32, 30, 27, 0.18);
 
   --radius-xs: 2px;
   --radius-sm: 2px;

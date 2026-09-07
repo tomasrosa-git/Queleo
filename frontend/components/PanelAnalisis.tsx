@@ -52,7 +52,7 @@ export function PanelAnalisis({ libro }: { libro: Libro }) {
         <>
           <Puntajes libro={libro} prediccion={analisis.prediccion} />
 
-          <p className="mb-6 max-w-[58ch] text-[15px] leading-relaxed">
+          <p className="mb-6 max-w-[56ch] font-serif text-[16px] leading-relaxed">
             {sinMarkdown(analisis.sinopsis)}
           </p>
 
@@ -60,7 +60,7 @@ export function PanelAnalisis({ libro }: { libro: Libro }) {
             <p className="mb-2.5 text-[11px] uppercase tracking-[0.1em] text-piedra">
               Por qué te predecimos ese puntaje
             </p>
-            <p className="m-0 max-w-[58ch] text-[15px] leading-relaxed">
+            <p className="m-0 max-w-[56ch] font-serif text-[16px] leading-relaxed">
               {sinMarkdown(analisis.razonamiento)}
             </p>
           </div>

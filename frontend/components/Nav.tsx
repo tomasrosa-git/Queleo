@@ -16,7 +16,7 @@ export function Nav() {
 
   return (
     <nav className="mb-12 flex flex-col gap-4 border-b border-linea pb-5 pt-7 sm:flex-row sm:items-center sm:justify-between sm:gap-0">
-      <Link href="/" className="text-xl font-bold tracking-tight no-underline">
+      <Link href="/" className="font-serif text-[22px] font-bold tracking-tight no-underline">
         Queleo
       </Link>
 
